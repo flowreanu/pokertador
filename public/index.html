@@ -17,7 +17,7 @@
 html,body{height:100%}
 body{background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   display:flex;flex-direction:column;min-height:100dvh;-webkit-tap-highlight-color:transparent}
-button,input{font:inherit;color:inherit}
+button,input,select{font:inherit;color:inherit}
 [hidden]{display:none!important}
 .muted{color:var(--muted)}
 
@@ -27,10 +27,9 @@ button,input{font:inherit;color:inherit}
 .logo{font-size:44px;line-height:1;color:var(--gold)}
 .home-card h1{font-size:26px;font-weight:650;letter-spacing:-.01em}
 .home-card p{color:var(--muted)}
-.field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
-.field{min-width:0}
-.field input{width:100%;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:16px;color:var(--text)}
-.field input:focus{outline:none;border-color:var(--gold)}
+.field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);min-width:0}
+.field input,.field select{width:100%;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:16px;color:var(--text)}
+.field input:focus,.field select:focus{outline:none;border-color:var(--gold)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
 .btn{flex:1;padding:12px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);
@@ -41,15 +40,18 @@ button,input{font:inherit;color:inherit}
 .btn.call{background:#18412e;border-color:#2c6b4b}
 .btn.raise{background:#5c4a1a;border-color:#8c722b;color:#fbe9b5}
 .btn.main{background:var(--gold);border-color:var(--gold);color:#17130a}
-.mini{background:transparent;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;color:var(--text)}
+.mini{position:relative;background:transparent;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;color:var(--text);white-space:nowrap}
 .mini:hover{border-color:var(--muted)}
+.mini i{position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;border-radius:9px;background:var(--red);color:#fff;font-style:normal;font-size:11px;line-height:17px;text-align:center;padding:0 4px}
 
 /* ---------- masa ---------- */
 #game{flex:1;display:flex;flex-direction:column;min-height:0}
 .top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line)}
-.brand{font-weight:650;display:flex;gap:8px;align-items:baseline}
+.brand{font-weight:650;display:flex;gap:8px;align-items:baseline;min-width:0}
 .brand b{color:var(--gold);font-size:18px}
 .top-r{display:flex;gap:8px;align-items:center}
+.ico{display:none}
+@media (max-width:640px){ .lbl{display:none} .ico{display:inline} .top{padding:8px 10px} .top-r{gap:6px} .mini{padding:6px 9px} }
 
 .stage-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 8px 4px;min-height:0}
 .stage{position:relative;aspect-ratio:16/10;width:min(100%,calc((100dvh - 215px)*1.6),1050px)}
@@ -72,9 +74,6 @@ button,input{font:inherit;color:inherit}
 .card.back{background:repeating-linear-gradient(45deg,#1d3a63 0 4px,#244677 4px 8px);border:2px solid rgba(232,238,236,.18)}
 .card.empty{background:rgba(0,0,0,.16);box-shadow:none;border:1px dashed rgba(255,255,255,.1)}
 .card.dim{opacity:.4}
-.card.hl{box-shadow:0 0 0 2px var(--gold),0 2px 8px rgba(0,0,0,.5)}
-.card.deal{animation:deal .25s ease-out}
-@keyframes deal{from{transform:translateY(-8px);opacity:0}to{transform:none;opacity:1}}
 
 .seat{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;z-index:2}
 .seat .cards{display:flex;gap:3px;margin-bottom:-6px;position:relative;z-index:1;--cw:var(--cw-o);min-height:calc(var(--cw)*1.4 - 6px)}
@@ -82,6 +81,7 @@ button,input{font:inherit;color:inherit}
 .plate{position:relative;min-width:clamp(78px,10vw,108px);max-width:130px;padding:10px 10px 7px;background:var(--panel);
   border:1px solid var(--line);border-radius:10px;text-align:center;overflow:hidden}
 .nm{font-weight:600;font-size:clamp(11px,1.3vw,13px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nm .crown{color:var(--gold);font-weight:400;margin-right:3px}
 .stk{color:var(--gold);font-variant-numeric:tabular-nums;font-size:clamp(11px,1.3vw,13px)}
 .act{font-size:clamp(10px,1.1vw,11px);color:var(--muted);height:14px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .seat.turn .plate{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 0 18px rgba(230,195,106,.28)}
@@ -96,6 +96,14 @@ button,input{font:inherit;color:inherit}
 .bet{position:absolute;transform:translate(-50%,-50%);background:rgba(0,0,0,.42);padding:2px 9px 2px 7px;border-radius:999px;
   font-size:clamp(11px,1.3vw,13px);font-variant-numeric:tabular-nums;z-index:1;white-space:nowrap}
 .bet::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-right:6px}
+
+/* bule de chat / reacții */
+#fx{position:absolute;inset:0;pointer-events:none;z-index:6}
+.bub{position:absolute;transform:translate(-50%,-100%);background:#f4f1ea;color:#16191a;padding:5px 10px;border-radius:12px;
+  font-size:13px;max-width:190px;overflow-wrap:anywhere;box-shadow:0 4px 14px rgba(0,0,0,.5);animation:bub 4s forwards}
+.bub.emo{background:none;box-shadow:none;font-size:36px;line-height:1;padding:0;animation:emo 2.6s forwards}
+@keyframes bub{0%{opacity:0;margin-top:8px}8%{opacity:1;margin-top:0}85%{opacity:1}100%{opacity:0}}
+@keyframes emo{0%{opacity:0;margin-top:20px;scale:.5}12%{opacity:1;margin-top:0;scale:1.15}80%{opacity:1;margin-top:-26px;scale:1}100%{opacity:0;margin-top:-50px}}
 
 /* ---------- bară de acțiuni ---------- */
 .bar{border-top:1px solid var(--line);background:var(--panel);padding:10px 12px calc(10px + env(safe-area-inset-bottom));min-height:96px}
@@ -118,10 +126,39 @@ button,input{font:inherit;color:inherit}
 .bar-in .btns.single .btn{flex:0 1 260px}
 .bar-in .btns.single{justify-content:center}
 
+/* ---------- chat ---------- */
+#chat{position:fixed;top:56px;right:10px;width:min(320px,calc(100vw - 20px));height:min(430px,calc(100dvh - 150px));
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;z-index:15;
+  box-shadow:0 14px 44px rgba(0,0,0,.55);overflow:hidden}
+.chat-h{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);font-weight:600}
+#chat-log{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:5px;font-size:14px}
+.cm{overflow-wrap:anywhere}
+.cm b{color:var(--gold);font-weight:600;margin-right:4px}
+.cm b.me{color:#9fd9b8}
+.cm.sys{color:var(--muted);font-size:12.5px;font-style:italic}
+.reacts{display:flex;gap:2px;justify-content:space-between;padding:6px 8px;border-top:1px solid var(--line)}
+.reacts button{background:none;border:0;font-size:21px;cursor:pointer;border-radius:8px;padding:2px 3px;transition:transform .1s}
+.reacts button:hover{background:var(--panel2);transform:scale(1.15)}
+.chat-in{display:flex;gap:6px;padding:8px;border-top:1px solid var(--line)}
+.chat-in input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:16px}
+.chat-in input:focus{outline:none;border-color:var(--gold)}
+#emo-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:6px 8px 10px;border-top:1px solid var(--line);background:var(--panel2)}
+#emo-grid button{background:none;border:0;font-size:22px;cursor:pointer;border-radius:8px;padding:3px}
+#emo-grid button:hover{background:var(--panel)}
+
 /* ---------- modale ---------- */
 .modal{position:fixed;inset:0;background:rgba(5,8,7,.82);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
 .modal-card{width:min(360px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.modal-card.wide{width:min(460px,100%);max-height:92dvh;overflow:auto}
 .modal-card h2{font-size:20px}
+.mh{display:flex;justify-content:space-between;align-items:center}
+.sec{display:flex;flex-direction:column;gap:10px;padding-top:14px;border-top:1px solid var(--line)}
+.sec:first-of-type{border-top:0;padding-top:0}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--gold)}
+.prow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;font-size:14px}
+.prow span.s{color:var(--gold);font-variant-numeric:tabular-nums;margin-left:8px;font-size:13px}
+.prow .mini{color:#f0b3ae;border-color:#5a2a27}
 #toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#2a1716;border:1px solid #5a2a27;color:#f0b3ae;
   padding:8px 14px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90vw;text-align:center}
 #toast.show{opacity:1}
@@ -135,7 +172,7 @@ button,input{font:inherit;color:inherit}
   <div class="home-card">
     <div class="logo">♠</div>
     <h1>Poker cu prietenii</h1>
-    <p>Creezi o masă, trimiți linkul și jucați Texas Hold'em. Fără conturi, fără bani reali — doar fise virtuale.</p>
+    <p>Creezi o masă, trimiți linkul și jucați Texas Hold'em. Fără conturi, fără bani reali — doar fise virtuale. Tu, cel care creezi masa, ești adminul.</p>
     <div class="row2">
       <label class="field">Fise de start
         <input id="h-stack" type="number" inputmode="numeric" value="1000" min="100" step="100">
@@ -155,7 +192,10 @@ button,input{font:inherit;color:inherit}
     <div class="brand"><b>♠</b><span id="room-code"></span><span class="muted" id="blinds" style="font-size:13px"></span></div>
     <div class="top-r">
       <span class="muted" id="conn" style="font-size:13px"></span>
-      <button class="mini" id="copy">Copiază linkul</button>
+      <button class="mini" id="b-snd" title="Sunet">🔊</button>
+      <button class="mini" id="b-chat" title="Chat">💬<i id="chat-badge" hidden>0</i></button>
+      <button class="mini" id="b-admin" hidden title="Setări admin">⚙<span class="lbl"> Admin</span></button>
+      <button class="mini" id="copy" title="Copiază linkul de invitație"><span class="lbl">Copiază linkul</span><span class="ico">🔗</span></button>
       <button class="mini" id="leave">Ieși</button>
     </div>
   </header>
@@ -164,9 +204,60 @@ button,input{font:inherit;color:inherit}
       <div class="felt"></div>
       <div id="seats"></div>
       <div class="center" id="center"></div>
+      <div id="fx"></div>
     </div>
   </div>
   <footer class="bar"><div class="bar-in" id="bar"></div></footer>
+</div>
+
+<!-- CHAT -->
+<aside id="chat" hidden>
+  <div class="chat-h"><span>Chat</span><button class="mini" id="chat-x">✕</button></div>
+  <div id="chat-log"></div>
+  <div class="reacts" id="reacts"></div>
+  <form class="chat-in" id="chat-form" autocomplete="off">
+    <button type="button" class="mini" id="emo-btn">😊</button>
+    <input id="chat-input" maxlength="200" placeholder="Scrie un mesaj…">
+    <button class="mini" type="submit">Trimite</button>
+  </form>
+  <div id="emo-grid" hidden></div>
+</aside>
+
+<!-- ADMIN -->
+<div class="modal" id="admin" hidden>
+  <div class="modal-card wide">
+    <div class="mh"><h2>Setări admin</h2><button class="mini" id="a-close">✕</button></div>
+    <div class="sec">
+      <button class="btn main" id="a-start">Începe jocul</button>
+      <button class="btn" id="a-pause">Pauză după mâna curentă</button>
+    </div>
+    <div class="sec">
+      <div class="row2">
+        <label class="field">Small blind
+          <input id="a-sb" type="number" inputmode="numeric" min="1">
+        </label>
+        <label class="field">Timp pe tură
+          <select id="a-timer">
+            <option value="15">15 secunde</option><option value="20">20 secunde</option>
+            <option value="30">30 secunde</option><option value="45">45 secunde</option>
+            <option value="60">60 secunde</option><option value="90">90 secunde</option>
+          </select>
+        </label>
+      </div>
+      <div class="muted" id="a-bb" style="font-size:13px"></div>
+      <label class="chk"><input type="checkbox" id="a-rebuy"> Permite rebuy</label>
+      <button class="btn raise" id="a-save">Salvează setările</button>
+      <div class="muted" style="font-size:12px">Blind-urile noi se aplică de la mâna următoare.</div>
+    </div>
+    <div class="sec">
+      <div class="muted" style="font-size:13px">Jucători la masă</div>
+      <div id="a-players"></div>
+    </div>
+    <div class="sec">
+      <button class="btn" id="a-copyadmin">Copiază linkul de admin</button>
+      <div class="muted" style="font-size:12px">Păstrează-l doar pentru tine: cine îl deschide devine admin. Îți folosește dacă schimbi telefonul sau ștergi datele browserului.</div>
+    </div>
+  </div>
 </div>
 
 <!-- NUME -->
@@ -209,6 +300,65 @@ function toast(msg, ok) {
 }
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+/* ================= SUNETE (sintetizate, fără fișiere) ================= */
+const Snd = (() => {
+  let ctx = null, nbuf = null, muted = store.get('poker_mute') === '1';
+  const live = () => (ctx && !muted ? ctx : null);
+  function unlock() {
+    if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; } }
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+  }
+  function tone(f, d, type, v, delay, f2) {
+    const c = live(); if (!c) return;
+    const t = c.currentTime + (delay || 0);
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(f, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(v || 0.2, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + d + 0.03);
+  }
+  function noise(d, v, f, q, delay, ftype, f2) {
+    const c = live(); if (!c) return;
+    if (!nbuf) {
+      nbuf = c.createBuffer(1, c.sampleRate, c.sampleRate);
+      const a = nbuf.getChannelData(0);
+      for (let i = 0; i < a.length; i++) a[i] = Math.random() * 2 - 1;
+    }
+    const t = c.currentTime + (delay || 0);
+    const s = c.createBufferSource(); s.buffer = nbuf;
+    const fl = c.createBiquadFilter(); fl.type = ftype || 'bandpass'; fl.Q.value = q || 1;
+    fl.frequency.setValueAtTime(f, t);
+    if (f2) fl.frequency.exponentialRampToValueAtTime(f2, t + d);
+    const g = c.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(v, t + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    s.connect(fl); fl.connect(g); g.connect(c.destination);
+    s.start(t, Math.random() * 0.5); s.stop(t + d + 0.03);
+  }
+  const api = {
+    unlock,
+    get muted() { return muted; },
+    toggle() { muted = !muted; store.set('poker_mute', muted ? '1' : '0'); return muted; },
+    deal() { noise(0.07, 0.55, 2800, 0.8); },
+    chip(n) { for (let i = 0; i < (n || 2); i++) { noise(0.05, 0.5, 5200, 2, i * 0.05); tone(2300 - i * 120, 0.05, 'triangle', 0.05, i * 0.05); } },
+    check() { tone(160, 0.09, 'sine', 0.5, 0, 70); noise(0.04, 0.3, 500, 1, 0, 'lowpass'); },
+    fold() { noise(0.17, 0.4, 2000, 0.7, 0, 'bandpass', 500); },
+    allin() { api.chip(5); tone(95, 0.28, 'sine', 0.5, 0, 45); },
+    turn() { tone(880, 0.12, 'triangle', 0.22); tone(1318, 0.2, 'triangle', 0.22, 0.11); },
+    tick() { tone(1000, 0.04, 'square', 0.05); },
+    win() { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.24, 'triangle', 0.24, i * 0.09)); },
+    msg() { tone(1300, 0.05, 'sine', 0.12); tone(1700, 0.07, 'sine', 0.09, 0.05); },
+    emote() { tone(660, 0.1, 'sine', 0.14, 0, 990); },
+  };
+  return api;
+})();
+['pointerdown', 'keydown', 'touchstart'].forEach((ev) => window.addEventListener(ev, Snd.unlock, { passive: true }));
+
 const m = location.pathname.match(/^\/t\/([a-z0-9]+)/i);
 if (!m) { initHome(); return; }
 initGame(m[1].toLowerCase());
@@ -226,6 +376,7 @@ function initHome() {
         body: JSON.stringify({ stack: Number(stack.value), sb: Number(sb.value) }) });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || 'Eroare');
+      store.set('poker_admin_' + j.id, j.admin);
       location.href = '/t/' + j.id;
     } catch (e) { toast(e.message || 'Nu am putut crea masa'); btn.disabled = false; }
   });
@@ -236,14 +387,20 @@ function initGame(room) {
   $('#game').hidden = false;
   $('#room-code').textContent = room;
 
+  // linkul de admin: /t/xxxxx#a=CHEIE
+  const hm = location.hash.match(/#a=([a-f0-9]+)/i);
+  if (hm) { store.set('poker_admin_' + room, hm[1]); history.replaceState(null, '', location.pathname); }
+  const adminKey = () => store.get('poker_admin_' + room) || '';
+
   let token = store.get('poker_token_' + room);
   if (!token) {
     token = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now());
     store.set('poker_token_' + room, token);
   }
   let myName = store.get('poker_name') || '';
-  let ws = null, retry = 0, closedByUs = false, S = null, offset = 0, joined = false;
-  let raiseVal = 0, sent = false, barSig = '', prevTurnMe = false, prevHand = -1;
+  let ws = null, retry = 0, closedByUs = false, S = null, offset = 0;
+  let raiseVal = 0, sent = false, barSig = '', prevTurnMe = false, lastTick = 0;
+  let chatLog = [], chatOpen = false, unread = 0;
 
   /* --- conectare --- */
   function connect() {
@@ -251,12 +408,25 @@ function initGame(room) {
     ws = new WebSocket(`${proto}://${location.host}/ws`);
     ws.onopen = () => {
       retry = 0; $('#conn').textContent = '';
-      ws.send(JSON.stringify({ type: 'join', room, name: myName, token }));
+      ws.send(JSON.stringify({ type: 'join', room, name: myName, token, admin: adminKey() }));
     };
     ws.onmessage = (e) => {
       let d; try { d = JSON.parse(e.data); } catch (x) { return; }
-      if (d.type === 'state') { joined = true; sent = false; offset = d.now - Date.now(); S = d; render(); }
-      else if (d.type === 'error') {
+      if (d.type === 'state') {
+        const prev = S; sent = false; offset = d.now - Date.now(); S = d;
+        render(); playDiff(prev, d); refreshAdmin();
+      } else if (d.type === 'chatlog') {
+        chatLog = d.msgs || []; renderChat();
+      } else if (d.type === 'chat') {
+        chatLog.push(d.msg); if (chatLog.length > 50) chatLog.shift(); renderChat();
+        if (!d.msg.sys) {
+          bubble(d.msg.seat, esc(d.msg.text.slice(0, 70)));
+          if (S && d.msg.seat !== S.me) { Snd.msg(); if (!chatOpen) { unread++; updBadge(); } }
+        }
+      } else if (d.type === 'emote') {
+        bubble(d.seat, d.e, 'emo');
+        if (S && d.seat !== S.me) Snd.emote();
+      } else if (d.type === 'error') {
         if (d.fatal) { closedByUs = true; fatal('Nu pot intra la masă', d.msg); }
         else { toast(d.msg); sent = false; barSig = ''; if (S) renderBar(); }
       }
@@ -280,7 +450,7 @@ function initGame(room) {
     });
   }
 
-  /* --- top --- */
+  /* --- bara de sus --- */
   $('#copy').addEventListener('click', async () => {
     const url = location.origin + '/t/' + room;
     try { await navigator.clipboard.writeText(url); toast('Link copiat — trimite-l prietenilor', true); }
@@ -291,6 +461,89 @@ function initGame(room) {
     send({ type: 'leave' }); closedByUs = true; store.del('poker_token_' + room);
     setTimeout(() => { location.href = '/'; }, 150);
   });
+  const sndBtn = () => { $('#b-snd').textContent = Snd.muted ? '🔇' : '🔊'; };
+  $('#b-snd').addEventListener('click', () => { Snd.toggle(); sndBtn(); if (!Snd.muted) Snd.chip(2); });
+  sndBtn();
+
+  /* --- chat --- */
+  const EMOJIS = ['😀','😂','🤣','😎','😏','😅','😭','😡','🤔','😬','🙄','😴','🤝','👍','👎','👏','🙏','🔥','💪','🍀','💰','🃏','♠️','♥️','♦️','♣️','🎉','🤡'];
+  const REACTS = ['👍','😂','😎','😭','🔥','😡','🤝','🍀','👏','🤔'];
+  $('#reacts').innerHTML = REACTS.map((e) => `<button type="button" data-e="${e}">${e}</button>`).join('');
+  $('#emo-grid').innerHTML = EMOJIS.map((e) => `<button type="button" data-e="${e}">${e}</button>`).join('');
+  $('#reacts').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) send({ type: 'emote', e: b.dataset.e }); });
+  $('#emo-grid').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    const i = $('#chat-input'); i.value += b.dataset.e; i.focus();
+  });
+  $('#emo-btn').addEventListener('click', () => { $('#emo-grid').hidden = !$('#emo-grid').hidden; });
+  $('#chat-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const i = $('#chat-input'); const t = i.value.trim(); if (!t) return;
+    send({ type: 'chat', text: t }); i.value = ''; $('#emo-grid').hidden = true;
+  });
+  function updBadge() { const b = $('#chat-badge'); b.hidden = unread === 0; b.textContent = unread > 9 ? '9+' : unread; }
+  function setChat(open) {
+    chatOpen = open; $('#chat').hidden = !open;
+    if (open) { unread = 0; updBadge(); renderChat(true); if (matchMedia('(hover:hover)').matches) $('#chat-input').focus(); }
+  }
+  $('#b-chat').addEventListener('click', () => setChat(!chatOpen));
+  $('#chat-x').addEventListener('click', () => setChat(false));
+  function renderChat(force) {
+    const box = $('#chat-log');
+    const near = box.scrollHeight - box.scrollTop - box.clientHeight < 50;
+    box.innerHTML = chatLog.map((c) => c.sys
+      ? `<div class="cm sys">${esc(c.text)}</div>`
+      : `<div class="cm"><b class="${S && c.seat === S.me ? 'me' : ''}">${esc(c.name)}</b>${esc(c.text)}</div>`).join('');
+    if (near || force) box.scrollTop = box.scrollHeight;
+  }
+  function bubble(seat, html, cls) {
+    const el = document.querySelector(`.seat[data-seat="${seat}"]`); if (!el) return;
+    const st = $('#stage').getBoundingClientRect(), r = el.getBoundingClientRect();
+    const b = document.createElement('div');
+    b.className = 'bub' + (cls ? ' ' + cls : ''); b.innerHTML = html;
+    b.style.left = (r.left + r.width / 2 - st.left) + 'px';
+    b.style.top = (r.top - st.top + 6) + 'px';
+    $('#fx').appendChild(b);
+    setTimeout(() => b.remove(), cls === 'emo' ? 2700 : 4100);
+  }
+
+  /* --- admin --- */
+  const A = { open: false };
+  $('#b-admin').addEventListener('click', () => {
+    if (!S || !S.you.isAdmin) return;
+    const s = S.you.settings || {};
+    $('#a-sb').value = s.sb; $('#a-timer').value = String(s.timer); $('#a-rebuy').checked = !!s.allowRebuy;
+    updBb(); $('#admin').hidden = false; A.open = true; refreshAdmin();
+  });
+  $('#a-close').addEventListener('click', () => { $('#admin').hidden = true; A.open = false; });
+  $('#admin').addEventListener('click', (e) => { if (e.target.id === 'admin') { $('#admin').hidden = true; A.open = false; } });
+  const updBb = () => { $('#a-bb').textContent = `Big blind: ${(Number($('#a-sb').value) || 0) * 2}`; };
+  $('#a-sb').addEventListener('input', updBb);
+  $('#a-start').addEventListener('click', () => { send({ type: 'start' }); $('#admin').hidden = true; A.open = false; });
+  $('#a-pause').addEventListener('click', () => send({ type: 'pause', on: !(S && S.paused) }));
+  $('#a-save').addEventListener('click', () => {
+    send({ type: 'settings', sb: Number($('#a-sb').value), timer: Number($('#a-timer').value), allowRebuy: $('#a-rebuy').checked });
+    toast('Setări trimise', true);
+  });
+  $('#a-copyadmin').addEventListener('click', async () => {
+    const url = `${location.origin}/t/${room}#a=${adminKey()}`;
+    try { await navigator.clipboard.writeText(url); toast('Link de admin copiat — nu-l da altcuiva', true); }
+    catch (e) { prompt('Link de admin (păstrează-l pentru tine):', url); }
+  });
+  $('#a-players').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-kick]'); if (!b) return;
+    if (confirm(`Scoți jucătorul ${b.dataset.name} de la masă?`)) send({ type: 'kick', seat: Number(b.dataset.kick) });
+  });
+  function refreshAdmin() {
+    if (!A.open || !S) return;
+    if (!S.you.isAdmin) { $('#admin').hidden = true; A.open = false; return; }
+    $('#a-start').hidden = S.started;
+    $('#a-start').disabled = !S.you.canStart;
+    $('#a-start').textContent = S.you.canStart ? 'Începe jocul' : 'Începe jocul (minim 2 jucători)';
+    $('#a-pause').hidden = !S.started;
+    $('#a-pause').textContent = S.paused ? '▶ Reia jocul' : '⏸ Pauză după mâna curentă';
+    $('#a-players').innerHTML = S.seats.filter(Boolean).map((p) => `<div class="prow"><div>${p.admin ? '<span style="color:var(--gold)">♛</span> ' : ''}${esc(p.name)}${p.connected ? '' : ' <span class="muted">(offline)</span>'}<span class="s">${fmt(p.stack)}</span></div>${p.seat === S.me ? '' : `<button class="mini" data-kick="${p.seat}" data-name="${esc(p.name)}">Scoate</button>`}</div>`).join('');
+  }
 
   /* --- randare --- */
   function cardHtml(c, extra) {
@@ -301,14 +554,18 @@ function initGame(room) {
   }
 
   function render() {
-    $('#blinds').textContent = `${S.sb}/${S.bb}`;
+    $('#blinds').textContent = `${S.sb}/${S.bb}` + (S.paused ? ' · ⏸ pauză' : '');
+    $('#b-admin').hidden = !S.you.isAdmin;
     renderSeats(); renderCenter(); renderBar();
     const myTurn = S.turn === S.me;
     document.title = myTurn ? '▶ Rândul tău · Poker' : 'Poker cu prietenii';
-    if (myTurn && !prevTurnMe && navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) {
-      try { navigator.vibrate(150); } catch (e) { /* ignorat */ }
+    if (myTurn && !prevTurnMe) {
+      Snd.turn();
+      if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) {
+        try { navigator.vibrate(150); } catch (e) { /* ignorat */ }
+      }
     }
-    prevTurnMe = myTurn; prevHand = S.handNo;
+    prevTurnMe = myTurn;
   }
 
   function renderSeats() {
@@ -323,7 +580,6 @@ function initGame(room) {
       const me = p.seat === S.me;
       const isTurn = S.turn === p.seat;
       const cls = ['seat', me && 'me', isTurn && 'turn', p.folded && 'folded', !p.connected && 'away', p.winner && 'winner'].filter(Boolean).join(' ');
-      const showdownRef = S.phase === 'ended' && S.result && S.result.showdown;
       const cards = p.cards.map((c) => cardHtml(c, (p.folded && me) ? 'dim' : '')).join('');
       let act = p.handName || p.last || '';
       if (!act && p.sitOut) act = 'absent';
@@ -331,7 +587,7 @@ function initGame(room) {
       const dealer = S.handNo > 0 && S.dealer === p.seat;
       html += `<div class="${cls}" data-seat="${p.seat}" style="left:${x}%;top:${y}%">
         <div class="cards">${cards}</div>
-        <div class="plate"><div class="nm">${esc(p.name)}${me ? ' (tu)' : ''}</div><div class="stk">${fmt(p.stack)}</div>
+        <div class="plate"><div class="nm">${p.admin ? '<span class="crown">♛</span>' : ''}${esc(p.name)}${me ? ' (tu)' : ''}</div><div class="stk">${fmt(p.stack)}</div>
         <div class="act">${esc(act)}</div>${isTurn ? '<div class="timer"></div>' : ''}</div>
         ${dealer ? '<div class="dbtn">D</div>' : ''}</div>`;
       if (p.bet > 0) {
@@ -348,13 +604,18 @@ function initGame(room) {
     const k = S.seats.filter(Boolean).length;
     let msg = '', cls = 'msg', extra = '';
     if (!S.started) {
-      msg = k < 2 ? 'Trimite linkul prietenilor — aștept minim 2 jucători' : `${k} jucători la masă`;
-      if (S.you.canStart) extra = '<button class="btn main" id="start" style="flex:none;padding:10px 22px">Începe jocul</button>';
+      if (S.you.isAdmin) {
+        msg = k < 2 ? 'Trimite linkul prietenilor — aștept minim 2 jucători' : `${k} jucători la masă`;
+        if (S.you.canStart) extra = '<button class="btn main" id="start" style="flex:none;padding:10px 22px">Începe jocul</button>';
+      } else {
+        msg = `${k} jucători la masă · aștept ca adminul să înceapă jocul`;
+      }
     } else if (S.result && !S.handActive) {
-      msg = S.result.text; cls = 'msg win';
-      if (S.nextHandAt) msg += ` <span class="muted" id="cd"></span>`;
+      msg = esc(S.result.text); cls = 'msg win';
+      if (S.paused) msg += ' <span class="muted">· ⏸ pauză</span>';
+      else if (S.nextHandAt) msg += ' <span class="muted" id="cd"></span>';
     } else if (!S.handActive) {
-      msg = 'Aștept alți jucători…';
+      msg = S.paused ? '⏸ Joc în pauză' : 'Aștept alți jucători…';
     }
     $('#center').innerHTML = `<div class="board">${board}</div><div class="pot">${S.pot > 0 ? 'Pot ' + fmt(S.pot) : ''}</div><div class="${cls}">${msg}</div>${extra}`;
     const st = $('#start'); if (st) st.onclick = () => send({ type: 'start' });
@@ -364,7 +625,7 @@ function initGame(room) {
     const y = S.you, me = S.seats[S.me];
     if (!me) return;
     const turnName = S.turn >= 0 && S.seats[S.turn] ? S.seats[S.turn].name : '';
-    const sig = JSON.stringify([y.isTurn, y.toCall, y.minRaiseTo, y.maxTo, y.canRaise, y.canRebuy, me.sitOut, S.currentBet, S.pot, S.handActive, y.hand, me.folded, turnName, sent]);
+    const sig = JSON.stringify([y.isTurn, y.toCall, y.minRaiseTo, y.maxTo, y.canRaise, y.canRebuy, me.sitOut, S.currentBet, S.pot, S.handActive, y.hand, me.folded, turnName, sent, S.started, S.paused]);
     if (sig === barSig) return;
     barSig = sig;
     const bar = $('#bar');
@@ -414,7 +675,7 @@ function initGame(room) {
 
     // nu e rândul tău
     let info = '';
-    if (!S.started) info = 'Masa nu a început încă';
+    if (!S.started) info = S.you.isAdmin ? 'Tu ești adminul · pornește jocul din butonul de pe masă' : 'Masa nu a început încă';
     else if (me.sitOut) info = 'Ești marcat absent (ai ratat două ture).';
     else if (y.canRebuy) info = 'Ai rămas fără fise.';
     else if (S.handActive && me.folded) info = 'Ai dat fold' + (turnName ? ` · acum joacă <b>${esc(turnName)}</b>` : '');
@@ -429,6 +690,28 @@ function initGame(room) {
     bar.querySelectorAll('[data-x]').forEach((b) => b.addEventListener('click', () => send({ type: b.dataset.x })));
   }
 
+  /* --- sunete la schimbări de stare --- */
+  function playDiff(prev, cur) {
+    if (!prev) return;
+    if (cur.handNo !== prev.handNo && cur.handActive) { Snd.deal(); setTimeout(Snd.deal, 120); }
+    if (cur.board.length > prev.board.length) Snd.deal();
+    if (cur.handNo === prev.handNo) {
+      for (const p of cur.seats) {
+        if (!p) continue;
+        const q = prev.seats[p.seat];
+        if (!q || !p.last || p.last === q.last) continue;
+        const l = p.last;
+        if (l.startsWith('Fold')) Snd.fold();
+        else if (l.startsWith('Check')) Snd.check();
+        else if (l.startsWith('All-in')) Snd.allin();
+        else Snd.chip(l.startsWith('Raise') || l.startsWith('Bet') ? 3 : 2);
+      }
+    }
+    if (prev.handActive && !cur.handActive && cur.result) {
+      if (cur.result.winners.some((w) => w.seat === cur.me)) Snd.win(); else Snd.chip(2);
+    }
+  }
+
   /* --- timere vizuale --- */
   setInterval(() => {
     if (!S) return;
@@ -438,6 +721,10 @@ function initGame(room) {
       const left = Math.max(0, S.turnDeadline - now);
       t.style.width = Math.min(100, (left / S.turnTotal) * 100) + '%';
       t.classList.toggle('low', left < 8000);
+      if (S.turn === S.me && left > 0 && left <= 5000) {
+        const sec = Math.ceil(left / 1000);
+        if (sec !== lastTick) { lastTick = sec; Snd.tick(); }
+      }
     }
     const cd = $('#cd');
     if (cd && S.nextHandAt) cd.textContent = `· următoarea mână în ${Math.max(0, Math.ceil((S.nextHandAt - now) / 1000))}s`;

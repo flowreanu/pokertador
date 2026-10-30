@@ -43,9 +43,10 @@ const server = http.createServer((req, res) => {
       const stack = clamp(o.stack, 100, 1000000, 1000);
       const sb = clamp(o.sb, 1, Math.floor(stack / 4), 10);
       const id = newRoomId();
-      rooms.set(id, new Table(id, { stack, sb }));
+      const admin = crypto.randomBytes(16).toString('hex');
+      rooms.set(id, new Table(id, { stack, sb, adminKey: admin }));
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ id }));
+      res.end(JSON.stringify({ id, admin }));
     });
     return;
   }
@@ -88,7 +89,7 @@ wss.on('connection', (ws) => {
       }
       const token = String(msg.token || '').slice(0, 64);
       if (token.length < 8) return;
-      const r = table.join(token, msg.name, ws);
+      const r = table.join(token, msg.name, ws, String(msg.admin || '').slice(0, 64));
       if (r.error) {
         ws.send(JSON.stringify({ type: 'error', fatal: true, msg: r.error }));
         return;

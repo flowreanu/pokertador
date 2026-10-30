@@ -45,6 +45,29 @@ require('fs').mkdirSync(OUT, { recursive: true });
   await pages[0].waitForTimeout(400);
   await pages[0].screenshot({ path: `${OUT}/02-lobby.png` });
 
+  // doar adminul vede butonul de start și setările
+  const has = async (pg, sel) => !!(await pg.$(sel));
+  console.log('Admin vede Start:', await has(pages[0], '#start'), '| Maria:', await has(pages[1], '#start'), '| Dan:', await has(pages[2], '#start'));
+  console.log('Admin vede ⚙:', await pages[0].isVisible('#b-admin'), '| Maria:', await pages[1].isVisible('#b-admin'));
+  await pages[1].screenshot({ path: `${OUT}/02b-lobby-guest.png` });
+  await pages[0].click('#b-admin');
+  await pages[0].waitForSelector('#admin:not([hidden])');
+  await pages[0].screenshot({ path: `${OUT}/02c-admin.png` });
+  await pages[0].click('#a-close');
+
+  // chat + emoji
+  await pages[1].click('#b-chat');
+  await pages[1].fill('#chat-input', 'Salut băieți 😎 pregătiți de pierdut?');
+  await pages[1].press('#chat-input', 'Enter');
+  await pages[1].click('#reacts button[data-e="🔥"]');
+  await pages[0].waitForSelector('.bub');
+  await pages[0].click('#b-chat');
+  await pages[0].waitForTimeout(300);
+  const log = await pages[0].textContent('#chat-log');
+  console.log('Chat primit de admin:', /Salut băieți/.test(log) ? 'OK' : 'LIPSEȘTE');
+  await pages[0].screenshot({ path: `${OUT}/02d-chat.png` });
+  await pages[0].click('#chat-x');
+
   await pages[0].click('#start');
   await pages[0].waitForSelector('.seat .cards .card', { timeout: 8000 });
   await pages[0].waitForTimeout(600);

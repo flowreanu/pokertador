@@ -60,6 +60,20 @@ class Table {
     this.nextTimer = null;
     this.streetTimer = null;
     this.lastActivity = Date.now();
+
+    this.adminKey = opts.adminKey || null;
+    this.banned = new Set();
+    this.chat = [];
+    this.paused = false;
+    this.allowRebuy = true;
+    this.pendingSb = null;
+  }
+
+  checkAdmin(key) {
+    if (!this.adminKey || typeof key !== 'string' || !key) return false;
+    const a = Buffer.from(key);
+    const b = Buffer.from(this.adminKey);
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
   }
 
   /* ---------- utilitare ---------- */
@@ -91,7 +105,9 @@ class Table {
 
   /* ---------- intrare / ieșire ---------- */
 
-  join(token, name, ws) {
+  join(token, name, ws, adminKey) {
+    if (this.banned.has(token)) return { error: 'Ai fost scos de la această masă.' };
+    let isNew = false;
     let p = this.findByToken(token);
     if (p) {
       const old = p.ws;
@@ -118,12 +134,17 @@ class Table {
         inHand: false, folded: false, allIn: false, bet: 0, totalBet: 0,
         acted: false, raiseLocked: false, cards: [], last: '', revealed: false,
         winner: false, score: 0, handName: '',
+        isAdmin: false, lastChatAt: 0, lastEmoteAt: 0,
       };
       this.seats[seat] = p;
+      isNew = true;
     }
+    if (this.checkAdmin(adminKey)) p.isAdmin = true;
     this.touch();
     this.maybeSchedule(this.t.firstHand);
     this.broadcast();
+    this.send(p, { type: 'chatlog', msgs: this.chat });
+    if (isNew) this.sys(`${p.name} s-a așezat la masă`);
     return { p };
   }
 
@@ -139,7 +160,8 @@ class Table {
     else this.broadcast();
   }
 
-  leave(p) {
+  leave(p, silent) {
+    if (!silent) this.sys(`${p.name} a ieșit de la masă`);
     p.connected = false;
     p.ws = null;
     p.leaving = true;
@@ -171,14 +193,63 @@ class Table {
         this.act(p, msg);
         return;
       case 'start':
+        if (!p.isAdmin) return this.err(p, 'Doar adminul poate porni jocul.');
         if (!this.started) {
           if (this.eligibleCount() < 2) return this.err(p, 'Sunt necesari minim 2 jucători.');
           this.started = true;
           this.phase = 'idle';
           this.maybeSchedule(this.t.firstHand);
+          this.sys('Jocul a început. Spor la cărți!');
         }
         break;
+      case 'pause':
+        if (!p.isAdmin) return this.err(p, 'Doar adminul poate pune pauză.');
+        this.paused = !!msg.on;
+        if (this.paused) {
+          clearTimeout(this.nextTimer);
+          this.nextTimer = null;
+          this.nextHandAt = 0;
+          this.sys('Jocul se oprește după mâna curentă (pauză)');
+        } else {
+          this.sys('Jocul continuă');
+          this.maybeSchedule(2000);
+        }
+        break;
+      case 'settings': {
+        if (!p.isAdmin) return this.err(p, 'Doar adminul poate schimba setările.');
+        if (msg.sb !== undefined) {
+          const sb = Math.floor(Number(msg.sb));
+          const max = Math.floor(this.startStack / 4);
+          if (!Number.isFinite(sb) || sb < 1 || sb > max) return this.err(p, `Small blind invalid (1–${max}).`);
+          if (this.handActive) this.pendingSb = sb;
+          else { this.sb = sb; this.bb = sb * 2; this.pendingSb = null; }
+        }
+        const tm = Math.floor(Number(msg.timer));
+        if ([15, 20, 30, 45, 60, 90].includes(tm)) this.t.turn = tm * 1000;
+        if (typeof msg.allowRebuy === 'boolean') this.allowRebuy = msg.allowRebuy;
+        this.sys('Adminul a actualizat setările mesei');
+        break;
+      }
+      case 'kick': {
+        if (!p.isAdmin) return this.err(p, 'Doar adminul poate scoate jucători.');
+        const t = this.seats[Math.floor(Number(msg.seat))];
+        if (!t || t === p) return;
+        this.banned.add(t.token);
+        this.send(t, { type: 'error', fatal: true, msg: 'Ai fost scos de la masă de admin.' });
+        const w = t.ws;
+        this.sys(`${t.name} a fost scos de la masă`);
+        this.leave(t, true);
+        if (w) { try { w.close(); } catch (e) { /* ignorat */ } }
+        break;
+      }
+      case 'chat':
+        this.chatMsg(p, msg.text);
+        return;
+      case 'emote':
+        this.emote(p, msg.e);
+        return;
       case 'rebuy':
+        if (!this.allowRebuy) return this.err(p, 'Adminul a dezactivat rebuy.');
         if (p.stack === 0 && !(this.handActive && p.inHand)) {
           p.stack = this.startStack;
           p.rebuys++;
@@ -208,7 +279,7 @@ class Table {
   /* ---------- pornirea unei mâini ---------- */
 
   maybeSchedule(delay) {
-    if (!this.started || this.handActive || this.nextTimer) return;
+    if (!this.started || this.handActive || this.nextTimer || this.paused) return;
     if (this.eligibleCount() < 2) { this.nextHandAt = 0; return; }
     this.nextHandAt = Date.now() + delay;
     this.nextTimer = setTimeout(() => { this.nextTimer = null; this.startHand(); }, delay);
@@ -218,7 +289,8 @@ class Table {
     clearTimeout(this.nextTimer);
     this.nextTimer = null;
     this.nextHandAt = 0;
-    if (this.handActive) return;
+    if (this.handActive || this.paused) return;
+    if (this.pendingSb) { this.sb = this.pendingSb; this.bb = this.sb * 2; this.pendingSb = null; }
 
     // elimină jucătorii care au ieșit
     for (const p of this.players()) if (p.leaving) this.seats[p.seat] = null;
@@ -495,6 +567,43 @@ class Table {
     this.broadcast();
   }
 
+  /* ---------- chat ---------- */
+
+  send(p, obj) {
+    if (p.ws && p.ws.readyState === 1) {
+      try { p.ws.send(JSON.stringify(obj)); } catch (e) { /* ignorat */ }
+    }
+  }
+
+  broadcastRaw(obj) {
+    for (const p of this.players()) this.send(p, obj);
+  }
+
+  pushChat(m) {
+    this.chat.push(m);
+    if (this.chat.length > 50) this.chat.shift();
+    this.broadcastRaw({ type: 'chat', msg: m });
+  }
+
+  sys(text) { this.pushChat({ sys: true, text, ts: Date.now() }); }
+
+  chatMsg(p, text) {
+    const now = Date.now();
+    if (now - p.lastChatAt < 600) return;
+    text = String(text || '').replace(/[\u0000-\u001f\u007f<>]/g, ' ').trim().slice(0, 200);
+    if (!text) return;
+    p.lastChatAt = now;
+    this.pushChat({ seat: p.seat, name: p.name, text, ts: now });
+  }
+
+  emote(p, e) {
+    const ok = ['👍', '😂', '😎', '😭', '🔥', '😡', '🤝', '🍀', '👏', '🤔'];
+    const now = Date.now();
+    if (!ok.includes(e) || now - p.lastEmoteAt < 400) return;
+    p.lastEmoteAt = now;
+    this.broadcastRaw({ type: 'emote', seat: p.seat, e });
+  }
+
   /* ---------- trimiterea stării ---------- */
 
   view(me) {
@@ -519,7 +628,7 @@ class Table {
       return {
         seat: p.seat, name: p.name, stack: p.stack, bet: p.bet, folded: p.folded,
         allIn: p.allIn, connected: p.connected, sitOut: p.sitOut, inHand: p.inHand,
-        last: p.last, winner: p.winner, cards,
+        last: p.last, winner: p.winner, admin: p.isAdmin, cards,
         handName: p.revealed && this.phase === 'ended' ? p.handName : '',
       };
     };
@@ -529,6 +638,7 @@ class Table {
       now: Date.now(),
       room: this.id,
       started: this.started,
+      paused: this.paused,
       phase: this.phase,
       handActive: this.handActive,
       handNo: this.handNo,
@@ -546,8 +656,12 @@ class Table {
       seats: this.seats.map((p) => (p ? pub(p) : null)),
       you: {
         isTurn, toCall, minRaiseTo, maxTo, canRaise, hand: myHand,
-        canRebuy: me.stack === 0 && !(this.handActive && me.inHand),
-        canStart: !this.started && this.eligibleCount() >= 2,
+        canRebuy: me.stack === 0 && this.allowRebuy && !(this.handActive && me.inHand),
+        isAdmin: me.isAdmin,
+        canStart: me.isAdmin && !this.started && this.eligibleCount() >= 2,
+        settings: me.isAdmin
+          ? { sb: this.pendingSb || this.sb, timer: this.t.turn / 1000, allowRebuy: this.allowRebuy }
+          : null,
       },
     };
   }

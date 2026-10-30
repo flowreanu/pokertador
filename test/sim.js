@@ -125,4 +125,42 @@ async function simulate(nPlayers, hands, seed) {
   assert.deepStrictEqual(pots[0].eligible.map((p) => p.name), ['A', 'B', 'C']);
   assert.deepStrictEqual(pots[1].eligible.map((p) => p.name), ['B', 'C']);
   console.log('Side pots: OK');
+
+  /* ---------- admin + chat ---------- */
+  const KEY = 'k'.repeat(32);
+  const a = new Table('ad', { stack: 1000, sb: 10, adminKey: KEY, timing: { firstHand: 600000, nextHand: 600000 } });
+  const mkws = () => ({ readyState: 1, send() {}, close() {} });
+  const adm = a.join('tok-admin-0001', 'Admin', mkws(), KEY).p;
+  const usr = a.join('tok-user-00001', 'User', mkws(), 'gresit').p;
+  assert(adm.isAdmin && !usr.isAdmin, 'doar cheia corectă dă admin');
+  a.onMessage(usr, { type: 'start' });
+  assert(!a.started, 'un jucător obișnuit nu poate porni jocul');
+  a.onMessage(usr, { type: 'settings', sb: 50 });
+  assert.strictEqual(a.sb, 10, 'un jucător obișnuit nu poate schimba blinds');
+  a.onMessage(usr, { type: 'pause', on: true });
+  assert(!a.paused, 'un jucător obișnuit nu poate pune pauză');
+  a.onMessage(usr, { type: 'kick', seat: adm.seat });
+  assert(a.seats[adm.seat], 'un jucător obișnuit nu poate scoate pe nimeni');
+  a.onMessage(adm, { type: 'settings', sb: 25, timer: 45, allowRebuy: false });
+  assert.strictEqual(a.bb, 50);
+  assert.strictEqual(a.t.turn, 45000);
+  assert.strictEqual(a.allowRebuy, false);
+  a.onMessage(adm, { type: 'start' });
+  assert(a.started, 'adminul poate porni jocul');
+  assert(a.view(adm).you.settings && !a.view(usr).you.settings, 'setările se văd doar de admin');
+  assert(!JSON.stringify(a.view(usr)).includes(KEY) && !JSON.stringify(a.view(adm)).includes(KEY), 'cheia nu se trimite niciodată');
+
+  a.onMessage(usr, { type: 'chat', text: '  salut <b>lume</b>  ' });
+  const last = a.chat[a.chat.length - 1];
+  assert.strictEqual(last.name, 'User');
+  assert(!last.text.includes('<'), 'chat curățat');
+  const n = a.chat.length;
+  a.onMessage(usr, { type: 'chat', text: 'spam' });
+  assert.strictEqual(a.chat.length, n, 'limită de viteză pe chat');
+
+  a.onMessage(adm, { type: 'kick', seat: usr.seat });
+  assert(!a.seats[usr.seat], 'jucător scos');
+  assert(a.join('tok-user-00001', 'User', mkws(), '').error, 'cel scos nu mai poate intra');
+  a.destroy();
+  console.log('Admin + chat: OK');
 })().catch((e) => { console.error(e); process.exit(1); });
