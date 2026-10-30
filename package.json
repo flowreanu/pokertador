@@ -1,0 +1,16 @@
+{
+  "name": "poker-prieteni",
+  "version": "1.0.0",
+  "description": "Poker Texas Hold'em minimalist pentru prieteni, pe bază de link de invitație",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/sim.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
