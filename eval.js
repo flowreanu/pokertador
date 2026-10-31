@@ -41,15 +41,16 @@ function rank5(cs) {
   return score;
 }
 
-// Cel mai bun scor de 5 cărți din 5..7 cărți.
-function bestScore(cards) {
+// Cea mai bună mână de 5 cărți din 5..7 cărți: { score, five }.
+function bestFive(cards) {
   const n = cards.length;
   let best = -1;
+  let combo = null;
   const pick = [];
   (function rec(start) {
     if (pick.length === 5) {
       const s = rank5(pick);
-      if (s > best) best = s;
+      if (s > best) { best = s; combo = pick.slice(); }
       return;
     }
     for (let i = start; i < n; i++) {
@@ -58,7 +59,11 @@ function bestScore(cards) {
       pick.pop();
     }
   })(0);
-  return best;
+  return { score: best, five: combo };
+}
+
+function bestScore(cards) {
+  return bestFive(cards).score;
 }
 
 function handName(score) {
@@ -70,4 +75,4 @@ function handName(score) {
   return CATS[cat];
 }
 
-module.exports = { bestScore, handName, rank5 };
+module.exports = { bestScore, bestFive, handName, rank5 };

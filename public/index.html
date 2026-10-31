@@ -9,14 +9,14 @@
 :root{
   --bg:#0a0d0c; --panel:#141918; --panel2:#1b2220; --line:#26302d;
   --text:#e8eeec; --muted:#8a9994; --gold:#e6c36a; --red:#d0524a; --green:#3fa66b;
-  --felt1:#16553f; --felt2:#0b3024;
-  --cw-b:clamp(34px,5.2vw,58px); --cw-me:clamp(34px,4.6vw,52px); --cw-o:clamp(22px,2.8vw,32px);
+  --cw-b:clamp(34px,5.2vw,58px); --cw-me:clamp(34px,4.6vw,54px); --cw-o:clamp(20px,2.4vw,30px);
+  --av:clamp(40px,4.6vw,58px); --chs:clamp(14px,1.8vw,22px);
 }
-@media (max-width:640px){ :root{ --cw-b:clamp(34px,10.5vw,46px); --cw-me:clamp(34px,9vw,44px); --cw-o:clamp(20px,6vw,26px);} }
+@media (max-width:640px){ :root{ --cw-b:clamp(32px,9.4vw,44px); --cw-me:clamp(34px,9vw,44px); --cw-o:clamp(18px,5.4vw,24px); --av:clamp(36px,10.5vw,44px); --chs:clamp(13px,3.9vw,17px);} }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  display:flex;flex-direction:column;min-height:100dvh;-webkit-tap-highlight-color:transparent}
+body{background:radial-gradient(ellipse at 50% 0%,#14201c,var(--bg) 60%);color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  display:flex;flex-direction:column;min-height:100dvh;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
 button,input,select{font:inherit;color:inherit}
 [hidden]{display:none!important}
 .muted{color:var(--muted)}
@@ -32,73 +32,144 @@ button,input,select{font:inherit;color:inherit}
 .field input:focus,.field select:focus{outline:none;border-color:var(--gold)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-.btn{flex:1;padding:12px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);
-  color:var(--text);font-weight:600;font-size:15px;cursor:pointer;transition:filter .15s,transform .05s}
-.btn:hover{filter:brightness(1.12)} .btn:active{transform:scale(.98)}
+.btn{flex:1;padding:12px 10px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);
+  color:var(--text);font-weight:700;font-size:15px;cursor:pointer;transition:filter .15s,transform .05s}
+.btn:hover{filter:brightness(1.12)} .btn:active{transform:scale(.97)}
 .btn:disabled{opacity:.4;cursor:default;filter:none}
-.btn.fold{background:#2a1716;border-color:#5a2a27;color:#f0b3ae}
-.btn.call{background:#18412e;border-color:#2c6b4b}
-.btn.raise{background:#5c4a1a;border-color:#8c722b;color:#fbe9b5}
-.btn.main{background:var(--gold);border-color:var(--gold);color:#17130a}
+.btn.fold{background:linear-gradient(#4a2321,#2d1514);border-color:#7a3733;color:#ffc9c4}
+.btn.call{background:linear-gradient(#25704b,#17452f);border-color:#37966a}
+.btn.raise{background:linear-gradient(#a8832a,#6d5518);border-color:#d3ad4a;color:#fff3cf}
+.btn.main{background:linear-gradient(#f0cf7c,#d4a947);border-color:#f0cf7c;color:#2a2008}
 .mini{position:relative;background:transparent;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;color:var(--text);white-space:nowrap}
 .mini:hover{border-color:var(--muted)}
 .mini i{position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;border-radius:9px;background:var(--red);color:#fff;font-style:normal;font-size:11px;line-height:17px;text-align:center;padding:0 4px}
 
 /* ---------- masa ---------- */
 #game{flex:1;display:flex;flex-direction:column;min-height:0}
-.top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);background:rgba(10,13,12,.6)}
 .brand{font-weight:650;display:flex;gap:8px;align-items:baseline;min-width:0}
 .brand b{color:var(--gold);font-size:18px}
 .top-r{display:flex;gap:8px;align-items:center}
 .ico{display:none}
-@media (max-width:640px){ .lbl{display:none} .ico{display:inline} .top{padding:8px 10px} .top-r{gap:6px} .mini{padding:6px 9px} }
+@media (max-width:640px){ .lbl{display:none} .ico{display:inline} .top{padding:8px 10px} .top-r{gap:5px} .mini{padding:6px 8px} }
 
 .stage-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 8px 4px;min-height:0}
-.stage{position:relative;aspect-ratio:16/10;width:min(100%,calc((100dvh - 215px)*1.6),1050px)}
+.stage{position:relative;aspect-ratio:16/10;width:min(100%,calc((100dvh - 215px)*1.6),1050px);
+  --f1:#1a6a4d;--f2:#0a3326;--rail1:#6b4a2d;--rail2:#2f1f12}
 @media (max-aspect-ratio:1/1){ .stage{aspect-ratio:3/4;width:min(100%,calc((100dvh - 250px)*.75))} }
-.felt{position:absolute;inset:9% 3%;border-radius:50%;
-  background:radial-gradient(ellipse at 50% 40%,var(--felt1),var(--felt2) 75%);
-  border:7px solid #1a1f1d;box-shadow:inset 0 0 70px rgba(0,0,0,.5),0 12px 40px rgba(0,0,0,.5)}
+.stage[data-felt="blue"]{--f1:#1d5a8c;--f2:#0a2640;--rail1:#3b4656;--rail2:#161c25}
+.stage[data-felt="red"]{--f1:#8c2a3a;--f2:#3a0f18;--rail1:#5b3a2a;--rail2:#24120c}
+.stage[data-felt="purple"]{--f1:#5d3a93;--f2:#22123f;--rail1:#3c3550;--rail2:#16121f}
+.felt{position:absolute;inset:9% 2%;border-radius:50%;
+  background:radial-gradient(ellipse at 50% 38%,var(--f1),var(--f2) 78%);
+  border:13px solid transparent;
+  background-clip:padding-box;
+  box-shadow:0 0 0 13px var(--rail2),0 0 0 14px rgba(255,255,255,.08),inset 0 0 90px rgba(0,0,0,.55),0 18px 50px rgba(0,0,0,.65);
+  transition:background .6s}
+.felt::before{content:"";position:absolute;inset:-26px;border-radius:50%;border:13px solid var(--rail1);
+  background:transparent;z-index:-1;box-shadow:inset 0 2px 0 rgba(255,255,255,.14),inset 0 -3px 6px rgba(0,0,0,.5)}
+.felt::after{content:"♠";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(70px,13vw,170px);
+  color:rgba(255,255,255,.035);pointer-events:none;line-height:1}
+.ring-line{position:absolute;inset:calc(9% + 24px) calc(2% + 24px);border-radius:50%;border:1px solid rgba(230,195,106,.22);pointer-events:none}
 
-.center{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;width:70%}
-.board{display:flex;gap:clamp(3px,.6vw,7px);--cw:var(--cw-b)}
-.pot{font-size:clamp(12px,1.5vw,15px);color:var(--gold);font-variant-numeric:tabular-nums;min-height:20px;letter-spacing:.02em}
-.msg{font-size:clamp(12px,1.5vw,14px);color:#cfe0d8;min-height:18px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
-.msg.win{color:#baf0cf;font-weight:600}
+#cmsg{position:absolute;left:50%;top:32%;transform:translate(-50%,-50%);width:72%;text-align:center;z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+#cmsg .btn{pointer-events:auto}
+.msg{font-size:clamp(12px,1.5vw,14px);color:#d4e6dc;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.res{display:flex;flex-direction:column;align-items:center;gap:1px;animation:resin .55s cubic-bezier(.2,1.4,.4,1)}
+.res .w{font-size:clamp(13px,1.7vw,18px);text-shadow:0 2px 8px rgba(0,0,0,.7)}
+.res .w b{color:var(--gold)}
+.res .w .amt{color:#baf0cf;font-weight:700}
+.res .hn{font-size:clamp(11px,1.4vw,14px);color:#baf0cf;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+@keyframes resin{from{opacity:0;scale:.6}to{opacity:1;scale:1}}
 
-.card{width:var(--cw);height:calc(var(--cw)*1.4);border-radius:calc(var(--cw)*.13);background:#f4f1ea;color:#1b1b1b;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;
-  font-size:calc(var(--cw)*.46);line-height:1;box-shadow:0 2px 6px rgba(0,0,0,.5);user-select:none;flex:none}
-.card .s{font-size:calc(var(--cw)*.5);margin-top:calc(var(--cw)*.03)}
-.card.red{color:#c6362e}
-.card.back{background:repeating-linear-gradient(45deg,#1d3a63 0 4px,#244677 4px 8px);border:2px solid rgba(232,238,236,.18)}
-.card.empty{background:rgba(0,0,0,.16);box-shadow:none;border:1px dashed rgba(255,255,255,.1)}
-.card.dim{opacity:.4}
+#board{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);display:flex;gap:clamp(3px,.6vw,7px);--cw:var(--cw-b);z-index:2}
+.slot{position:relative;width:var(--cw-b);height:calc(var(--cw-b)*1.4);border-radius:calc(var(--cw-b)*.13);border:1px dashed rgba(255,255,255,.1);background:rgba(0,0,0,.16)}
+.slot .pc{position:absolute;left:0;top:0}
 
-.seat{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;z-index:2}
-.seat .cards{display:flex;gap:3px;margin-bottom:-6px;position:relative;z-index:1;--cw:var(--cw-o);min-height:calc(var(--cw)*1.4 - 6px)}
-.seat.me .cards{--cw:var(--cw-me)}
-.plate{position:relative;min-width:clamp(78px,10vw,108px);max-width:130px;padding:10px 10px 7px;background:var(--panel);
-  border:1px solid var(--line);border-radius:10px;text-align:center;overflow:hidden}
-.nm{font-weight:600;font-size:clamp(11px,1.3vw,13px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nm .crown{color:var(--gold);font-weight:400;margin-right:3px}
-.stk{color:var(--gold);font-variant-numeric:tabular-nums;font-size:clamp(11px,1.3vw,13px)}
-.act{font-size:clamp(10px,1.1vw,11px);color:var(--muted);height:14px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.seat.turn .plate{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 0 18px rgba(230,195,106,.28)}
-.seat.folded .plate,.seat.folded .cards{opacity:.45}
-.seat.away .nm::after{content:" ·off";color:var(--red);font-weight:400;font-size:10px}
-.seat.winner .plate{border-color:var(--green);box-shadow:0 0 0 1px var(--green),0 0 22px rgba(63,166,107,.45)}
-.seat.winner .act{color:#baf0cf}
-.timer{position:absolute;left:0;bottom:0;height:3px;background:var(--gold);width:100%}
-.timer.low{background:var(--red)}
-.dbtn{position:absolute;right:-9px;bottom:16px;width:20px;height:20px;border-radius:50%;background:var(--gold);color:#17130a;
-  font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.5);z-index:3}
-.bet{position:absolute;transform:translate(-50%,-50%);background:rgba(0,0,0,.42);padding:2px 9px 2px 7px;border-radius:999px;
-  font-size:clamp(11px,1.3vw,13px);font-variant-numeric:tabular-nums;z-index:1;white-space:nowrap}
-.bet::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-right:6px}
+#potbox{position:absolute;left:50%;top:61%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:3px;z-index:2;transition:opacity .3s}
+#potbox.empty{opacity:0}
+#potamt{background:rgba(0,0,0,.5);padding:1px 10px;border-radius:999px;font-size:clamp(11px,1.4vw,14px);color:var(--gold);font-variant-numeric:tabular-nums;font-weight:600}
+#potamt::before{content:"Pot ";color:var(--muted);font-weight:400}
 
-/* bule de chat / reacții */
-#fx{position:absolute;inset:0;pointer-events:none;z-index:6}
+/* ---------- cărți ---------- */
+.pc{width:var(--cw);height:calc(var(--cw)*1.4);perspective:700px;flex:none}
+.pc-in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.8,.3,1)}
+.pc.up .pc-in{transform:rotateY(180deg)}
+.pc-f,.pc-b{position:absolute;inset:0;border-radius:calc(var(--cw)*.13);backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.pc-b{background:repeating-linear-gradient(45deg,#1d3a63 0 4px,#244677 4px 8px);border:2px solid rgba(232,238,236,.22)}
+.pc-f{transform:rotateY(180deg);background:#f6f3ec;color:#1b1b1b;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-weight:700;font-size:calc(var(--cw)*.46);line-height:1}
+.pc-f.red{color:#c6362e}
+.pc-f .s{font-size:calc(var(--cw)*.5);margin-top:calc(var(--cw)*.03)}
+.pc.dim{opacity:.4}
+.pc.hl .pc-f{box-shadow:0 0 0 2px var(--gold),0 0 16px rgba(230,195,106,.9)}
+.pc.dm{filter:brightness(.5)}
+
+/* ---------- jucători ---------- */
+#seats{position:absolute;inset:0;z-index:4;pointer-events:none}
+.seat{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;transition:left .5s ease,top .5s ease,opacity .3s}
+.seat.enter{animation:seatin .45s cubic-bezier(.2,1.3,.4,1)}
+@keyframes seatin{from{opacity:0;scale:.5}to{opacity:1;scale:1}}
+.seat .cards{display:flex;gap:3px;margin-bottom:calc(var(--av)*-.32);position:relative;z-index:1;--cw:var(--cw-o);min-height:calc(var(--cw-o)*1.4*.68)}
+.seat.me .cards{--cw:var(--cw-me);min-height:calc(var(--cw-me)*1.4*.68);margin-bottom:calc(var(--av)*-.3)}
+.avwrap{position:relative;width:var(--av);height:var(--av);z-index:2}
+.ring{position:absolute;left:-6px;top:-6px;width:calc(100% + 12px);height:calc(100% + 12px);transform:rotate(-90deg);pointer-events:none}
+.ring circle{fill:none;stroke-width:2.6}
+.ring-bg{stroke:rgba(255,255,255,.08)}
+.ring-fg{stroke:var(--gold);stroke-linecap:round;stroke-dasharray:125.66;stroke-dashoffset:0;opacity:0;transition:stroke .3s}
+.seat.turn .ring-fg{opacity:1}
+.seat.turn .ring-fg.low{stroke:var(--red)}
+.av{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:calc(var(--av)*.58);line-height:1;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),transparent 55%),var(--avbg,#555);
+  border:2px solid rgba(255,255,255,.28);box-shadow:0 4px 12px rgba(0,0,0,.55);user-select:none}
+.seat.turn .av{animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 4px rgba(230,195,106,.35),0 0 22px rgba(230,195,106,.55)}}
+.seat.winner .av{box-shadow:0 0 0 3px var(--green),0 0 28px rgba(63,166,107,.9);animation:wink 1s ease-in-out 3}
+@keyframes wink{50%{scale:1.1}}
+.seat.folded .av,.seat.folded .plate{opacity:.45}
+.seat.away .av{filter:grayscale(1)}
+.plate{position:relative;margin-top:calc(var(--av)*-.22);padding:calc(var(--av)*.28) 10px 5px;min-width:clamp(72px,8.4vw,100px);max-width:130px;
+  background:linear-gradient(#1d2523,#101513);border:1px solid #2e3a36;border-radius:10px;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,.45)}
+.seat.turn .plate{border-color:var(--gold)}
+.seat.winner .plate{border-color:var(--green)}
+.nm{font-weight:650;font-size:clamp(11px,1.25vw,13px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nm .crown{color:var(--gold);margin-right:3px;font-weight:400}
+.stk{display:flex;align-items:center;justify-content:center;gap:5px;color:var(--gold);font-variant-numeric:tabular-nums;font-size:clamp(11px,1.25vw,13px);font-weight:600}
+.ms{display:inline-block;position:relative;width:12px;height:11px;flex:none}
+.ms::before{content:"";position:absolute;left:0;bottom:0;width:12px;height:5px;border-radius:50%;background:var(--gold);
+  box-shadow:0 -3px 0 #c9a24c,0 -6px 0 var(--gold),0 1px 0 #8c6f26}
+.act{font-size:clamp(10px,1.1vw,11px);height:14px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--muted);font-weight:600}
+.act.a-fold{color:#f0a39d}.act.a-check{color:#9ec8ff}.act.a-call{color:#8fe0b0}.act.a-raise{color:#ffd76a}.act.a-allin{color:#ff8a5c}.act.a-win{color:#baf0cf}
+.fl{position:absolute;left:50%;top:-4px;transform:translate(-50%,-100%);white-space:nowrap;font-weight:900;letter-spacing:.08em;font-size:clamp(11px,1.5vw,15px);
+  color:#fff;background:linear-gradient(90deg,#ff7a3d,#e0392f);padding:2px 9px;border-radius:8px;box-shadow:0 4px 14px rgba(255,90,40,.5);pointer-events:none;
+  animation:fl 1.6s forwards;z-index:5}
+@keyframes fl{0%{opacity:0;margin-top:10px;scale:.4}12%{opacity:1;margin-top:0;scale:1.2}22%{scale:1}85%{opacity:1}100%{opacity:0;margin-top:-10px}}
+
+#dbtn{position:absolute;width:clamp(20px,2.2vw,26px);height:clamp(20px,2.2vw,26px);border-radius:50%;background:linear-gradient(#fff,#d9d4c4);color:#17130a;
+  font-size:clamp(10px,1.2vw,13px);font-weight:900;display:flex;align-items:center;justify-content:center;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.6);
+  transform:translate(calc(-50% + var(--dx,40px)),-50%);transition:left .7s cubic-bezier(.3,.8,.3,1),top .7s cubic-bezier(.3,.8,.3,1),opacity .3s;opacity:0;border:2px solid #b8b09a}
+
+/* ---------- fise ---------- */
+.cs{display:flex;gap:2px;align-items:flex-end}
+.col{display:flex;flex-direction:column-reverse;align-items:center}
+.ch{display:block;width:var(--chs);height:calc(var(--chs)*.56);border-radius:50%;flex:none;
+  background:radial-gradient(ellipse at center,var(--c) 0 46%,transparent 48%),repeating-conic-gradient(#f4f1ea 0 15deg,var(--c) 15deg 30deg);
+  box-shadow:0 2px 0 var(--d),0 3px 3px rgba(0,0,0,.5)}
+.col .ch+.ch{margin-bottom:calc(var(--chs)*-.36)}
+.ch.fly{position:absolute;margin:0;--chs:clamp(14px,1.9vw,22px);z-index:20}
+#bets{position:absolute;inset:0;z-index:3;pointer-events:none}
+.bet{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:3px;transition:left .4s,top .4s}
+.bet .amt{background:rgba(0,0,0,.58);padding:1px 8px;border-radius:999px;font-size:clamp(10px,1.2vw,12px);font-variant-numeric:tabular-nums;color:#fff;font-weight:600}
+.bet.in{animation:betin .3s .42s backwards}
+@keyframes betin{from{opacity:0;scale:.4}}
+.pop{animation:pop .32s}
+@keyframes pop{50%{scale:1.18}}
+
+/* ---------- efecte ---------- */
+#fx{position:absolute;inset:0;pointer-events:none;z-index:30}
+.float{position:absolute;transform:translate(-50%,-50%);font-weight:900;font-size:clamp(18px,2.4vw,26px);color:var(--gold);text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.cf{position:absolute;width:7px;height:11px;border-radius:2px}
 .bub{position:absolute;transform:translate(-50%,-100%);background:#f4f1ea;color:#16191a;padding:5px 10px;border-radius:12px;
   font-size:13px;max-width:190px;overflow-wrap:anywhere;box-shadow:0 4px 14px rgba(0,0,0,.5);animation:bub 4s forwards}
 .bub.emo{background:none;box-shadow:none;font-size:36px;line-height:1;padding:0;animation:emo 2.6s forwards}
@@ -106,9 +177,11 @@ button,input,select{font:inherit;color:inherit}
 @keyframes emo{0%{opacity:0;margin-top:20px;scale:.5}12%{opacity:1;margin-top:0;scale:1.15}80%{opacity:1;margin-top:-26px;scale:1}100%{opacity:0;margin-top:-50px}}
 
 /* ---------- bară de acțiuni ---------- */
-.bar{border-top:1px solid var(--line);background:var(--panel);padding:10px 12px calc(10px + env(safe-area-inset-bottom));min-height:96px}
+.bar{border-top:1px solid var(--line);background:linear-gradient(#161c1a,#101514);padding:10px 12px calc(10px + env(safe-area-inset-bottom));min-height:96px;transition:box-shadow .3s}
+.bar.myturn{box-shadow:inset 0 2px 0 var(--gold),0 -8px 30px rgba(230,195,106,.12)}
 .bar-in{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
 .btns{display:flex;gap:8px}
+.bar .btns .btn{padding:14px 10px;font-size:16px;box-shadow:0 3px 0 rgba(0,0,0,.35)}
 .rz{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .rz input[type=range]{flex:1;min-width:120px;accent-color:var(--gold)}
 .rz input[type=number]{width:92px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 8px;font-variant-numeric:tabular-nums}
@@ -128,7 +201,7 @@ button,input,select{font:inherit;color:inherit}
 
 /* ---------- chat ---------- */
 #chat{position:fixed;top:56px;right:10px;width:min(320px,calc(100vw - 20px));height:min(430px,calc(100dvh - 150px));
-  background:var(--panel);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;z-index:15;
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;z-index:45;
   box-shadow:0 14px 44px rgba(0,0,0,.55);overflow:hidden}
 .chat-h{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);font-weight:600}
 #chat-log{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:5px;font-size:14px}
@@ -147,7 +220,7 @@ button,input,select{font:inherit;color:inherit}
 #emo-grid button:hover{background:var(--panel)}
 
 /* ---------- modale ---------- */
-.modal{position:fixed;inset:0;background:rgba(5,8,7,.82);display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
+.modal{position:fixed;inset:0;background:rgba(5,8,7,.82);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60}
 .modal-card{width:min(360px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:14px}
 .modal-card.wide{width:min(460px,100%);max-height:92dvh;overflow:auto}
 .modal-card h2{font-size:20px}
@@ -159,8 +232,11 @@ button,input,select{font:inherit;color:inherit}
 .prow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;font-size:14px}
 .prow span.s{color:var(--gold);font-variant-numeric:tabular-nums;margin-left:8px;font-size:13px}
 .prow .mini{color:#f0b3ae;border-color:#5a2a27}
+.avgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.avgrid button{background:var(--panel2);border:2px solid transparent;border-radius:12px;font-size:24px;padding:5px 0;cursor:pointer;line-height:1.1}
+.avgrid button.sel{border-color:var(--gold);background:#2a2616}
 #toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#2a1716;border:1px solid #5a2a27;color:#f0b3ae;
-  padding:8px 14px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90vw;text-align:center}
+  padding:8px 14px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:70;max-width:90vw;text-align:center}
 #toast.show{opacity:1}
 #toast.ok{background:#18412e;border-color:#2c6b4b;color:#baf0cf}
 </style>
@@ -192,6 +268,7 @@ button,input,select{font:inherit;color:inherit}
     <div class="brand"><b>♠</b><span id="room-code"></span><span class="muted" id="blinds" style="font-size:13px"></span></div>
     <div class="top-r">
       <span class="muted" id="conn" style="font-size:13px"></span>
+      <button class="mini" id="b-felt" title="Schimbă culoarea mesei">🎨</button>
       <button class="mini" id="b-snd" title="Sunet">🔊</button>
       <button class="mini" id="b-chat" title="Chat">💬<i id="chat-badge" hidden>0</i></button>
       <button class="mini" id="b-admin" hidden title="Setări admin">⚙<span class="lbl"> Admin</span></button>
@@ -200,14 +277,19 @@ button,input,select{font:inherit;color:inherit}
     </div>
   </header>
   <div class="stage-wrap">
-    <div class="stage" id="stage">
+    <div class="stage" id="stage" data-felt="green">
       <div class="felt"></div>
+      <div class="ring-line"></div>
+      <div id="cmsg"></div>
+      <div id="board"><div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div><div class="slot"></div></div>
+      <div id="potbox" class="empty"><div id="potchips"></div><div id="potamt">0</div></div>
+      <div id="bets"></div>
       <div id="seats"></div>
-      <div class="center" id="center"></div>
+      <div id="dbtn">D</div>
       <div id="fx"></div>
     </div>
   </div>
-  <footer class="bar"><div class="bar-in" id="bar"></div></footer>
+  <footer class="bar" id="barwrap"><div class="bar-in" id="bar"></div></footer>
 </div>
 
 <!-- CHAT -->
@@ -260,13 +342,16 @@ button,input,select{font:inherit;color:inherit}
   </div>
 </div>
 
-<!-- NUME -->
+<!-- NUME + AVATAR -->
 <div class="modal" id="join" hidden>
   <form class="modal-card" id="join-form">
     <h2>Intră la masă</h2>
     <label class="field">Numele tău
       <input id="j-name" maxlength="14" autocomplete="off" placeholder="ex. Andrei" required>
     </label>
+    <div class="field">Alege-ți avatarul
+      <div class="avgrid" id="avgrid"></div>
+    </div>
     <button class="btn main" type="submit">Așază-te</button>
   </form>
 </div>
@@ -299,6 +384,8 @@ function toast(msg, ok) {
   clearTimeout(toast.t); toast.t = setTimeout(() => { t.className = ''; }, 2600);
 }
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const AVATARS = ['🦊','🐼','🐯','🦁','🐸','🐵','🦄','🐙','🦉','🐺','🐻','🐷','🐲','🦈','🐧','🦖'];
+const AV_COLORS = ['#e57373','#64b5f6','#81c784','#ffb74d','#ba68c8','#4dd0e1','#f06292','#aed581','#ffd54f'];
 
 /* ================= SUNETE (sintetizate, fără fișiere) ================= */
 const Snd = (() => {
@@ -382,12 +469,31 @@ function initHome() {
   });
 }
 
+/* ================= FISE ================= */
+const DEN = [
+  [100000, '#2a2a2a', '#0c0c0c'], [25000, '#8a1f3d', '#5a1328'], [5000, '#2b4a8c', '#1d3363'],
+  [1000, '#e0922b', '#a96a15'], [500, '#7b3fa0', '#53286f'], [100, '#2b2e31', '#0f1112'],
+  [25, '#2e9a58', '#1d6b3b'], [5, '#cc3b3b', '#8f2424'], [1, '#e9e6df', '#aaa59a'],
+];
+function decompose(a) {
+  const out = [];
+  for (const [v, c, d] of DEN) {
+    const n = Math.floor(a / v);
+    if (n > 0) { out.push({ v, c, d, n: Math.min(n, 7) }); a -= n * v; }
+    if (out.length >= 5) break;
+  }
+  return out;
+}
+function chipsHtml(a) {
+  return '<div class="cs">' + decompose(a).map((g) =>
+    `<div class="col">${`<i class="ch" style="--c:${g.c};--d:${g.d}"></i>`.repeat(g.n)}</div>`).join('') + '</div>';
+}
+
 /* ================= MASA ================= */
 function initGame(room) {
   $('#game').hidden = false;
   $('#room-code').textContent = room;
 
-  // linkul de admin: /t/xxxxx#a=CHEIE
   const hm = location.hash.match(/#a=([a-f0-9]+)/i);
   if (hm) { store.set('poker_admin_' + room, hm[1]); history.replaceState(null, '', location.pathname); }
   const adminKey = () => store.get('poker_admin_' + room) || '';
@@ -398,9 +504,15 @@ function initGame(room) {
     store.set('poker_token_' + room, token);
   }
   let myName = store.get('poker_name') || '';
+  let myAvatar = store.get('poker_avatar') || AVATARS[Math.floor(Math.random() * AVATARS.length)];
   let ws = null, retry = 0, closedByUs = false, S = null, offset = 0;
   let raiseVal = 0, sent = false, barSig = '', prevTurnMe = false, lastTick = 0;
   let chatLog = [], chatOpen = false, unread = 0;
+
+  const stage = $('#stage'), fx = $('#fx');
+  const DEALER = { x: 50, y: 35 }, CENTER = { x: 50, y: 46 }, POT = { x: 50, y: 61 };
+  let POS = {};
+  const seatEls = {}, betEls = {};
 
   /* --- conectare --- */
   function connect() {
@@ -408,13 +520,14 @@ function initGame(room) {
     ws = new WebSocket(`${proto}://${location.host}/ws`);
     ws.onopen = () => {
       retry = 0; $('#conn').textContent = '';
-      ws.send(JSON.stringify({ type: 'join', room, name: myName, token, admin: adminKey() }));
+      ws.send(JSON.stringify({ type: 'join', room, name: myName, token, admin: adminKey(), avatar: myAvatar }));
     };
     ws.onmessage = (e) => {
       let d; try { d = JSON.parse(e.data); } catch (x) { return; }
       if (d.type === 'state') {
         const prev = S; sent = false; offset = d.now - Date.now(); S = d;
-        render(); playDiff(prev, d); refreshAdmin();
+        try { render(prev); } catch (err) { console.error(err); }
+        playDiff(prev, d); refreshAdmin();
       } else if (d.type === 'chatlog') {
         chatLog = d.msgs || []; renderChat();
       } else if (d.type === 'chat') {
@@ -440,13 +553,22 @@ function initGame(room) {
   function send(o) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); }
   function fatal(t, msg) { $('#fatal-t').textContent = t; $('#fatal-m').textContent = msg; $('#fatal').hidden = false; }
 
+  // avatar picker + nume
+  const avg = $('#avgrid');
+  avg.innerHTML = AVATARS.map((a) => `<button type="button" data-a="${a}" class="${a === myAvatar ? 'sel' : ''}">${a}</button>`).join('');
+  avg.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    myAvatar = b.dataset.a;
+    avg.querySelectorAll('button').forEach((x) => x.classList.toggle('sel', x === b));
+  });
   if (myName) connect();
   else {
     $('#join').hidden = false; $('#j-name').focus();
     $('#join-form').addEventListener('submit', (e) => {
       e.preventDefault();
       myName = $('#j-name').value.trim().slice(0, 14); if (!myName) return;
-      store.set('poker_name', myName); $('#join').hidden = true; connect();
+      store.set('poker_name', myName); store.set('poker_avatar', myAvatar);
+      $('#join').hidden = true; connect();
     });
   }
 
@@ -464,6 +586,10 @@ function initGame(room) {
   const sndBtn = () => { $('#b-snd').textContent = Snd.muted ? '🔇' : '🔊'; };
   $('#b-snd').addEventListener('click', () => { Snd.toggle(); sndBtn(); if (!Snd.muted) Snd.chip(2); });
   sndBtn();
+  const FELTS = ['green', 'blue', 'red', 'purple'];
+  const setFelt = (f) => { stage.dataset.felt = f; store.set('poker_felt', f); };
+  setFelt(FELTS.includes(store.get('poker_felt')) ? store.get('poker_felt') : 'green');
+  $('#b-felt').addEventListener('click', () => setFelt(FELTS[(FELTS.indexOf(stage.dataset.felt) + 1) % FELTS.length]));
 
   /* --- chat --- */
   const EMOJIS = ['😀','😂','🤣','😎','😏','😅','😭','😡','🤔','😬','🙄','😴','🤝','👍','👎','👏','🙏','🔥','💪','🍀','💰','🃏','♠️','♥️','♦️','♣️','🎉','🤡'];
@@ -497,13 +623,13 @@ function initGame(room) {
     if (near || force) box.scrollTop = box.scrollHeight;
   }
   function bubble(seat, html, cls) {
-    const el = document.querySelector(`.seat[data-seat="${seat}"]`); if (!el) return;
-    const st = $('#stage').getBoundingClientRect(), r = el.getBoundingClientRect();
+    const el = seatEls[seat]; if (!el) return;
+    const st = stage.getBoundingClientRect(), r = el.getBoundingClientRect();
     const b = document.createElement('div');
     b.className = 'bub' + (cls ? ' ' + cls : ''); b.innerHTML = html;
     b.style.left = (r.left + r.width / 2 - st.left) + 'px';
     b.style.top = (r.top - st.top + 6) + 'px';
-    $('#fx').appendChild(b);
+    fx.appendChild(b);
     setTimeout(() => b.remove(), cls === 'emo' ? 2700 : 4100);
   }
 
@@ -545,20 +671,147 @@ function initGame(room) {
     $('#a-players').innerHTML = S.seats.filter(Boolean).map((p) => `<div class="prow"><div>${p.admin ? '<span style="color:var(--gold)">♛</span> ' : ''}${esc(p.name)}${p.connected ? '' : ' <span class="muted">(offline)</span>'}<span class="s">${fmt(p.stack)}</span></div>${p.seat === S.me ? '' : `<button class="mini" data-kick="${p.seat}" data-name="${esc(p.name)}">Scoate</button>`}</div>`).join('');
   }
 
-  /* --- randare --- */
-  function cardHtml(c, extra) {
-    if (c === '??') return `<div class="card back ${extra || ''}"></div>`;
-    const r = c[0] === 'T' ? '10' : c[0];
-    const red = c[1] === 'h' || c[1] === 'd';
-    return `<div class="card ${red ? 'red' : ''} ${extra || ''}"><span>${r}</span><span class="s">${SUIT[c[1]]}</span></div>`;
+  /* ================= ANIMAȚII: utilitare ================= */
+  const sz = () => stage.getBoundingClientRect();
+  const toPx = (pc) => { const r = sz(); return { x: pc.x / 100 * r.width, y: pc.y / 100 * r.height }; };
+  const toScreen = (pc) => { const r = sz(); return { x: r.left + pc.x / 100 * r.width, y: r.top + pc.y / 100 * r.height }; };
+  const betPos = (seat) => { const p = POS[seat]; return { x: p.x + (CENTER.x - p.x) * 0.42, y: p.y + (CENTER.y - p.y) * 0.42 }; };
+  const pop = (el) => { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); };
+
+  function flyChips(from, to, amount, delay) {
+    const g = decompose(amount)[0] || { c: DEN[DEN.length - 1][1], d: DEN[DEN.length - 1][2] };
+    const n = Math.max(1, Math.min(6, Math.round(Math.log10(amount + 1) * 2)));
+    for (let i = 0; i < n; i++) {
+      const e = document.createElement('i');
+      e.className = 'ch fly';
+      e.style.cssText = `--c:${g.c};--d:${g.d};left:${from.x}px;top:${from.y}px;opacity:0`;
+      fx.appendChild(e);
+      const dx = to.x - from.x + (Math.random() - 0.5) * 10, dy = to.y - from.y + (Math.random() - 0.5) * 8;
+      const a = e.animate([
+        { opacity: 0, transform: 'translate(-50%,-50%) scale(.7)' },
+        { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.12 },
+        { opacity: 1, transform: `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(1)`, offset: 0.92 },
+        { opacity: 0, transform: `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.9)` },
+      ], { duration: 560 + i * 40, delay: delay + i * 70, easing: 'cubic-bezier(.35,.7,.3,1)', fill: 'backwards' });
+      a.onfinish = () => e.remove();
+    }
+  }
+  function floatText(seat, text, cls) {
+    if (!POS[seat]) return;
+    const c = toPx(POS[seat]);
+    const e = document.createElement('div');
+    e.className = 'float ' + (cls || ''); e.textContent = text;
+    e.style.left = c.x + 'px'; e.style.top = (c.y - 20) + 'px';
+    fx.appendChild(e);
+    const a = e.animate([
+      { opacity: 0, transform: 'translate(-50%,-50%) scale(.5)' },
+      { opacity: 1, transform: 'translate(-50%,-90%) scale(1.15)', offset: 0.2 },
+      { opacity: 1, transform: 'translate(-50%,-190%) scale(1)', offset: 0.75 },
+      { opacity: 0, transform: 'translate(-50%,-240%) scale(1)' },
+    ], { duration: 1700, easing: 'ease-out' });
+    a.onfinish = () => e.remove();
+  }
+  function confettiAt(seat, n) {
+    if (!POS[seat]) return;
+    const c = toPx(POS[seat]);
+    const cols = ['#e6c36a', '#3fa66b', '#d0524a', '#64b5f6', '#ba68c8', '#ffffff'];
+    for (let i = 0; i < n; i++) {
+      const e = document.createElement('i');
+      e.className = 'cf'; e.style.cssText = `left:${c.x}px;top:${c.y}px;background:${cols[i % cols.length]}`;
+      fx.appendChild(e);
+      const dx = (Math.random() - 0.5) * 320, dy = -90 - Math.random() * 170, rot = Math.random() * 720 - 360;
+      const a = e.animate([
+        { transform: 'translate(-50%,-50%) rotate(0)', opacity: 1 },
+        { transform: `translate(${dx}px,${dy}px) rotate(${rot / 2}deg)`, opacity: 1, offset: 0.45 },
+        { transform: `translate(${dx * 1.15}px,${dy + 280}px) rotate(${rot}deg)`, opacity: 0 },
+      ], { duration: 1000 + Math.random() * 900, easing: 'cubic-bezier(.2,.6,.4,1)' });
+      a.onfinish = () => e.remove();
+    }
+  }
+  function flashText(seat, text) {
+    const el = seatEls[seat]; if (!el) return;
+    const w = el.querySelector('.avwrap');
+    const f = document.createElement('div'); f.className = 'fl'; f.textContent = text;
+    w.appendChild(f); setTimeout(() => f.remove(), 1700);
+  }
+  function tween(el, to, delay) {
+    if (el._to === to) return;
+    el._to = to;
+    clearTimeout(el._t); cancelAnimationFrame(el._r);
+    if (el._v === undefined) { el._v = to; el.textContent = fmt(to); return; }
+    const start = () => {
+      const from = el._v, t0 = performance.now(), d = Math.min(900, 280 + Math.abs(to - from) * 0.5);
+      const step = (t) => {
+        const k = Math.min(1, (t - t0) / d);
+        el._v = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+        el.textContent = fmt(el._v);
+        if (k < 1) el._r = requestAnimationFrame(step); else el._v = to;
+      };
+      el._r = requestAnimationFrame(step);
+    };
+    if (delay) el._t = setTimeout(start, delay); else start();
   }
 
-  function render() {
+  /* ================= CĂRȚI ================= */
+  function makeCard() {
+    const c = document.createElement('div');
+    c.className = 'pc';
+    c.innerHTML = '<div class="pc-in"><div class="pc-f"></div><div class="pc-b"></div></div>';
+    c._face = null;
+    return c;
+  }
+  function fillFace(c, cs) {
+    const r = cs[0] === 'T' ? '10' : cs[0];
+    const red = cs[1] === 'h' || cs[1] === 'd';
+    const f = c.querySelector('.pc-f');
+    f.className = 'pc-f' + (red ? ' red' : '');
+    f.innerHTML = `<span>${r}</span><span class="s">${SUIT[cs[1]]}</span>`;
+    c._face = cs;
+  }
+  function flyCard(c, delay, hold) {
+    const r = c.getBoundingClientRect(), from = toScreen(DEALER);
+    const dx = from.x - (r.left + r.width / 2), dy = from.y - (r.top + r.height / 2);
+    c.style.opacity = 0;
+    const a = c.animate([
+      { transform: `translate(${dx}px,${dy}px) scale(.5) rotate(-25deg)`, opacity: 0 },
+      { opacity: 1, offset: 0.15 },
+      { transform: 'none', opacity: 1 },
+    ], { duration: 480, delay, easing: 'cubic-bezier(.25,.8,.3,1)', fill: 'both' });
+    a.onfinish = () => {
+      c.style.opacity = ''; a.cancel();
+      if (hold) { c._hold = false; setTimeout(() => c.classList.add('up'), 140); }
+    };
+    setTimeout(() => Snd.deal(), delay + 300);
+  }
+  function flyAway(c) {
+    const r = c.getBoundingClientRect(), to = toScreen(DEALER);
+    const dx = to.x - (r.left + r.width / 2), dy = to.y - (r.top + r.height / 2);
+    const a = c.animate([
+      { transform: 'none', opacity: 1 },
+      { transform: `translate(${dx}px,${dy}px) scale(.5) rotate(25deg)`, opacity: 0 },
+    ], { duration: 420, easing: 'ease-in', fill: 'forwards' });
+    a.onfinish = () => c.remove();
+  }
+
+  /* ================= RANDARE ================= */
+  let boardHand = -1, potShown = -1, potCleared = false, potHandNo = -1, potTimer = null, potClearTimer = null;
+
+  function render(prev) {
     $('#blinds').textContent = `${S.sb}/${S.bb}` + (S.paused ? ' · ⏸ pauză' : '');
     $('#b-admin').hidden = !S.you.isAdmin;
-    renderSeats(); renderCenter(); renderBar();
+    layoutSeats();
+    const ev = events(prev, S);
+    updateSeats(ev);
+    updateBoard(prev);
+    updateBets(prev);
+    updateDealer();
+    syncPot(prev, ev);
+    renderMsg();
+    renderBar();
+    applyHighlights();
     const myTurn = S.turn === S.me;
     document.title = myTurn ? '▶ Rândul tău · Poker' : 'Poker cu prietenii';
+    $('#barwrap').classList.toggle('myturn', myTurn && !sent);
     if (myTurn && !prevTurnMe) {
       Snd.turn();
       if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) {
@@ -568,57 +821,248 @@ function initGame(room) {
     prevTurnMe = myTurn;
   }
 
-  function renderSeats() {
-    const occ = S.seats.filter(Boolean);
-    const k = occ.length;
+  function makeSeat(seat) {
+    const el = document.createElement('div');
+    el.className = 'seat'; el.dataset.seat = seat;
+    el.innerHTML = `<div class="cards"></div>
+      <div class="avwrap"><svg class="ring" viewBox="0 0 44 44"><circle class="ring-bg" cx="22" cy="22" r="20"/><circle class="ring-fg" cx="22" cy="22" r="20"/></svg><div class="av"></div></div>
+      <div class="plate"><div class="nm"></div><div class="stk"><i class="ms"></i><b></b></div><div class="act"></div></div>`;
+    el._cards = []; el._hand = -1;
+    return el;
+  }
+
+  function layoutSeats() {
+    const occ = S.seats.filter(Boolean), k = occ.length;
     const hi = Math.max(0, occ.findIndex((p) => p.seat === S.me));
-    let html = '', bets = '';
+    POS = {};
     for (let i = 0; i < k; i++) {
       const p = occ[(hi + i) % k];
       const th = Math.PI / 2 + (i * 2 * Math.PI) / k;
-      const x = 50 + 44 * Math.cos(th), y = 48 + 37 * Math.sin(th);
-      const me = p.seat === S.me;
-      const isTurn = S.turn === p.seat;
-      const cls = ['seat', me && 'me', isTurn && 'turn', p.folded && 'folded', !p.connected && 'away', p.winner && 'winner'].filter(Boolean).join(' ');
-      const cards = p.cards.map((c) => cardHtml(c, (p.folded && me) ? 'dim' : '')).join('');
-      let act = p.handName || p.last || '';
-      if (!act && p.sitOut) act = 'absent';
-      if (p.winner && S.result) { const w = S.result.winners.find((q) => q.seat === p.seat); if (w) act = '+' + fmt(w.amount) + (p.handName ? ' · ' + p.handName : ''); }
-      const dealer = S.handNo > 0 && S.dealer === p.seat;
-      html += `<div class="${cls}" data-seat="${p.seat}" style="left:${x}%;top:${y}%">
-        <div class="cards">${cards}</div>
-        <div class="plate"><div class="nm">${p.admin ? '<span class="crown">♛</span>' : ''}${esc(p.name)}${me ? ' (tu)' : ''}</div><div class="stk">${fmt(p.stack)}</div>
-        <div class="act">${esc(act)}</div>${isTurn ? '<div class="timer"></div>' : ''}</div>
-        ${dealer ? '<div class="dbtn">D</div>' : ''}</div>`;
-      if (p.bet > 0) {
-        const bx = x + (50 - x) * 0.46, by = y + (46 - y) * 0.46;
-        bets += `<div class="bet" style="left:${bx}%;top:${by}%">${fmt(p.bet)}</div>`;
+      POS[p.seat] = { x: 50 + 44 * Math.cos(th), y: 48 + 37 * Math.sin(th) };
+    }
+    for (const p of occ) {
+      let el = seatEls[p.seat];
+      const pos = POS[p.seat];
+      if (!el) {
+        el = makeSeat(p.seat); seatEls[p.seat] = el;
+        el.style.left = pos.x + '%'; el.style.top = pos.y + '%';
+        el.classList.add('enter');
+        $('#seats').appendChild(el);
+      } else { el.style.left = pos.x + '%'; el.style.top = pos.y + '%'; }
+    }
+    for (const s of Object.keys(seatEls)) {
+      if (!POS[s]) {
+        const el = seatEls[s]; delete seatEls[s];
+        el.style.opacity = 0; setTimeout(() => el.remove(), 320);
+        if (betEls[s]) { betEls[s].remove(); delete betEls[s]; }
       }
     }
-    $('#seats').innerHTML = html + bets;
   }
 
-  function renderCenter() {
-    let board = '';
-    for (let i = 0; i < 5; i++) board += S.board[i] ? cardHtml(S.board[i], '') : '<div class="card empty"></div>';
+  function dealOrder(cur) {
+    const out = [];
+    for (let i = 1; i <= 9; i++) {
+      const s = (cur.dealer + i) % 9, p = cur.seats[s];
+      if (p && p.cards.length) out.push(s);
+    }
+    return out;
+  }
+
+  function events(prev, cur) {
+    const ev = { newHand: false, ended: false, collected: false, order: [], winDelay: {} };
+    if (!prev) return ev;
+    ev.newHand = prev.handNo !== cur.handNo && cur.handActive;
+    ev.ended = prev.handActive && !cur.handActive && !!cur.result;
+    if (ev.newHand) ev.order = dealOrder(cur);
+    const same = prev.handNo === cur.handNo;
+    for (const p of cur.seats) {
+      if (!p || !POS[p.seat]) continue;
+      const q = prev.seats[p.seat]; if (!q) continue;
+      const dBet = p.bet - q.bet;
+      if (dBet > 0) flyChips(toPx(POS[p.seat]), toPx(betPos(p.seat)), dBet, 0);
+      else if (q.bet > 0 && p.bet === 0 && same) {
+        flyChips(toPx(betPos(p.seat)), toPx(POT), q.bet, 0);
+        ev.collected = true;
+      }
+    }
+    if (ev.collected) setTimeout(() => Snd.chip(2), 380);
+    if (ev.ended) {
+      cur.result.winners.forEach((w, i) => {
+        if (!POS[w.seat]) return;
+        flyChips(toPx(POT), toPx(POS[w.seat]), w.amount, 800 + i * 150);
+        ev.winDelay[w.seat] = 1300 + i * 150;
+        setTimeout(() => {
+          floatText(w.seat, '+' + fmt(w.amount), 'win');
+          confettiAt(w.seat, w.seat === cur.me ? 60 : 24);
+        }, 1300 + i * 150);
+      });
+    }
+    return ev;
+  }
+
+  function updateSeats(ev) {
+    for (const p of S.seats) {
+      if (!p) continue;
+      const el = seatEls[p.seat]; if (!el) continue;
+      const me = p.seat === S.me;
+      el.classList.toggle('me', me);
+      el.classList.toggle('turn', S.turn === p.seat);
+      el.classList.toggle('folded', p.folded);
+      el.classList.toggle('away', !p.connected);
+      el.classList.toggle('winner', p.winner);
+      const av = el.querySelector('.av');
+      av.textContent = p.av || '🙂';
+      av.style.setProperty('--avbg', AV_COLORS[p.seat % AV_COLORS.length]);
+      el.querySelector('.nm').innerHTML = (p.admin ? '<span class="crown">♛</span>' : '') + esc(p.name) + (me ? ' (tu)' : '');
+      tween(el.querySelector('.stk b'), p.stack, ev.winDelay[p.seat] || 0);
+      let act = p.handName || p.last || '', cls = 'act';
+      if (!act && p.sitOut) act = 'absent';
+      if (/^Fold/.test(act)) cls += ' a-fold';
+      else if (/^Check/.test(act)) cls += ' a-check';
+      else if (/^Call/.test(act)) cls += ' a-call';
+      else if (/^(Raise|Bet)/.test(act)) cls += ' a-raise';
+      else if (/^All-in/.test(act)) cls += ' a-allin';
+      else if (p.handName) cls += ' a-win';
+      const actEl = el.querySelector('.act');
+      if (actEl.textContent !== act) { actEl.textContent = act; if (act) pop(actEl); }
+      actEl.className = cls + (actEl.classList.contains('pop') ? ' pop' : '');
+      if (/^All-in/.test(p.last || '') && el._lastAct !== p.last) flashText(p.seat, 'ALL IN');
+      el._lastAct = p.last;
+      updateSeatCards(p, el, ev);
+    }
+  }
+
+  function updateSeatCards(p, el, ev) {
+    const box = el.querySelector('.cards');
+    if (el._hand !== S.handNo) { box.innerHTML = ''; el._cards = []; el._hand = S.handNo; }
+    const want = p.cards;
+    if (!want.length) {
+      if (el._cards.length) { const cs = el._cards; el._cards = []; cs.forEach(flyAway); }
+      return;
+    }
+    const created = [];
+    while (el._cards.length < want.length) {
+      const c = makeCard(); box.appendChild(c); el._cards.push(c); created.push(c);
+    }
+    const dealing = ev.newHand && created.length === want.length;
+    want.forEach((cs, i) => {
+      const c = el._cards[i];
+      if (cs !== '??' && c._face !== cs) {
+        fillFace(c, cs);
+        if (dealing) c._hold = true; else c.classList.add('up');
+      }
+      c.classList.toggle('dim', p.folded && p.seat === S.me);
+    });
+    if (dealing) {
+      const j = Math.max(0, ev.order.indexOf(p.seat)), n = Math.max(1, ev.order.length);
+      created.forEach((c, r) => flyCard(c, (r * n + j) * 120 + 150, !!c._hold));
+    }
+  }
+
+  function updateBoard(prev) {
+    const slots = document.querySelectorAll('#board .slot');
+    if (boardHand !== S.handNo) { slots.forEach((s) => { s.innerHTML = ''; s._cs = null; }); boardHand = S.handNo; }
+    let k = 0;
+    slots.forEach((slot, i) => {
+      const cs = S.board[i];
+      if (!cs) { if (slot._cs) { slot.innerHTML = ''; slot._cs = null; } return; }
+      if (slot._cs === cs) return;
+      slot.innerHTML = '';
+      const c = makeCard(); fillFace(c, cs); slot.appendChild(c); slot._cs = cs;
+      if (!prev) { c.classList.add('up'); return; }
+      const delay = 120 + k * 300; k++;
+      flyCard(c, delay, false);
+      setTimeout(() => c.classList.add('up'), delay + 380);
+    });
+  }
+
+  function updateBets(prev) {
+    for (const p of S.seats) {
+      if (!p) continue;
+      let el = betEls[p.seat];
+      if (p.bet > 0 && POS[p.seat]) {
+        const bp = betPos(p.seat);
+        if (!el) {
+          el = document.createElement('div'); el.className = 'bet' + (prev ? ' in' : '');
+          el.innerHTML = '<div class="chipsbox"></div><div class="amt"></div>';
+          el.style.left = bp.x + '%'; el.style.top = bp.y + '%'; el._amt = -1;
+          $('#bets').appendChild(el); betEls[p.seat] = el;
+        } else { el.style.left = bp.x + '%'; el.style.top = bp.y + '%'; }
+        if (el._amt !== p.bet) {
+          el.querySelector('.chipsbox').innerHTML = chipsHtml(p.bet);
+          el.querySelector('.amt').textContent = fmt(p.bet);
+          if (el._amt > 0) pop(el);
+          el._amt = p.bet;
+        }
+      } else if (el) { el.remove(); delete betEls[p.seat]; }
+    }
+  }
+
+  function updateDealer() {
+    const d = $('#dbtn');
+    const p = POS[S.dealer];
+    if (S.handNo === 0 || !p) { d.style.opacity = 0; return; }
+    d.style.opacity = 1; d.style.left = p.x + '%'; d.style.top = p.y + '%';
+    d.style.setProperty('--dx', (p.x < 50 ? '' : '-') + '46px');
+  }
+
+  function setPot(v) {
+    if (v === potShown) return;
+    const up = v > potShown;
+    potShown = v;
+    $('#potchips').innerHTML = v > 0 ? chipsHtml(v) : '';
+    tween($('#potamt'), v, 0);
+    $('#potbox').classList.toggle('empty', v <= 0);
+    if (up && v > 0) pop($('#potbox'));
+  }
+  function syncPot(prev, ev) {
+    const bets = S.seats.reduce((s, p) => s + (p ? p.bet : 0), 0);
+    if (S.handNo !== potHandNo) { potHandNo = S.handNo; potCleared = false; clearTimeout(potClearTimer); }
+    if (!prev && !S.handActive && S.result) potCleared = true;
+    if (ev.ended) {
+      clearTimeout(potClearTimer);
+      potClearTimer = setTimeout(() => { potCleared = true; setPot(0); }, 1250);
+    }
+    const target = (!S.handActive && S.result) ? (potCleared ? 0 : S.pot) : Math.max(0, S.pot - bets);
+    clearTimeout(potTimer);
+    if (ev.collected) potTimer = setTimeout(() => setPot(target), 560); else setPot(target);
+  }
+
+  function renderMsg() {
     const k = S.seats.filter(Boolean).length;
-    let msg = '', cls = 'msg', extra = '';
+    let h = '';
     if (!S.started) {
       if (S.you.isAdmin) {
-        msg = k < 2 ? 'Trimite linkul prietenilor — aștept minim 2 jucători' : `${k} jucători la masă`;
-        if (S.you.canStart) extra = '<button class="btn main" id="start" style="flex:none;padding:10px 22px">Începe jocul</button>';
-      } else {
-        msg = `${k} jucători la masă · aștept ca adminul să înceapă jocul`;
-      }
+        h = `<div class="msg">${k < 2 ? 'Trimite linkul prietenilor — aștept minim 2 jucători' : k + ' jucători la masă'}</div>`;
+        if (S.you.canStart) h += '<button class="btn main" id="start" style="flex:none;padding:10px 24px">Începe jocul</button>';
+      } else h = `<div class="msg">${k} jucători la masă · aștept ca adminul să înceapă jocul</div>`;
     } else if (S.result && !S.handActive) {
-      msg = esc(S.result.text); cls = 'msg win';
-      if (S.paused) msg += ' <span class="muted">· ⏸ pauză</span>';
-      else if (S.nextHandAt) msg += ' <span class="muted" id="cd"></span>';
+      const w = S.result.winners;
+      const line = w.length === 1
+        ? `<b>${esc(w[0].name)}</b> câștigă <span class="amt">${fmt(w[0].amount)}</span>`
+        : w.map((x) => `<b>${esc(x.name)}</b> <span class="amt">+${fmt(x.amount)}</span>`).join(' · ');
+      h = `<div class="res"><div class="w">${line}</div>` +
+        (S.result.showdown && w[0] && w[0].hand ? `<div class="hn">${esc(w[0].hand)}</div>` : '') + '</div>';
+      h += S.paused ? '<div class="msg muted">⏸ pauză</div>' : (S.nextHandAt ? '<div class="msg muted" id="cd"></div>' : '');
     } else if (!S.handActive) {
-      msg = S.paused ? '⏸ Joc în pauză' : 'Aștept alți jucători…';
+      h = `<div class="msg">${S.paused ? '⏸ Joc în pauză' : 'Aștept alți jucători…'}</div>`;
     }
-    $('#center').innerHTML = `<div class="board">${board}</div><div class="pot">${S.pot > 0 ? 'Pot ' + fmt(S.pot) : ''}</div><div class="${cls}">${msg}</div>${extra}`;
-    const st = $('#start'); if (st) st.onclick = () => send({ type: 'start' });
+    const box = $('#cmsg');
+    if (box._h !== h) {
+      box._h = h; box.innerHTML = h;
+      const st = $('#start'); if (st) st.onclick = () => send({ type: 'start' });
+    }
+  }
+
+  function applyHighlights() {
+    const on = !!(S.result && S.result.showdown && !S.handActive);
+    const set = new Set();
+    if (on) S.result.winners.forEach((w) => (w.best || []).forEach((c) => set.add(c)));
+    document.querySelectorAll('#stage .pc').forEach((c) => {
+      const f = c._face, act = on && f && set.size > 0;
+      c.classList.toggle('hl', !!(act && set.has(f)));
+      c.classList.toggle('dm', !!(act && !set.has(f)));
+    });
   }
 
   function renderBar() {
@@ -673,7 +1117,6 @@ function initGame(room) {
       return;
     }
 
-    // nu e rândul tău
     let info = '';
     if (!S.started) info = S.you.isAdmin ? 'Tu ești adminul · pornește jocul din butonul de pe masă' : 'Masa nu a început încă';
     else if (me.sitOut) info = 'Ești marcat absent (ai ratat două ture).';
@@ -693,8 +1136,6 @@ function initGame(room) {
   /* --- sunete la schimbări de stare --- */
   function playDiff(prev, cur) {
     if (!prev) return;
-    if (cur.handNo !== prev.handNo && cur.handActive) { Snd.deal(); setTimeout(Snd.deal, 120); }
-    if (cur.board.length > prev.board.length) Snd.deal();
     if (cur.handNo === prev.handNo) {
       for (const p of cur.seats) {
         if (!p) continue;
@@ -708,27 +1149,29 @@ function initGame(room) {
       }
     }
     if (prev.handActive && !cur.handActive && cur.result) {
-      if (cur.result.winners.some((w) => w.seat === cur.me)) Snd.win(); else Snd.chip(2);
+      setTimeout(() => { if (cur.result.winners.some((w) => w.seat === cur.me)) Snd.win(); else Snd.chip(2); }, 1200);
     }
   }
 
-  /* --- timere vizuale --- */
+  /* --- timere vizuale (ring în jurul avatarului) --- */
+  const CIRC = 125.66;
   setInterval(() => {
     if (!S) return;
     const now = Date.now() + offset;
-    const t = document.querySelector('.seat.turn .timer');
+    const t = document.querySelector('.seat.turn');
     if (t && S.turnTotal) {
       const left = Math.max(0, S.turnDeadline - now);
-      t.style.width = Math.min(100, (left / S.turnTotal) * 100) + '%';
-      t.classList.toggle('low', left < 8000);
+      const fg = t.querySelector('.ring-fg');
+      fg.style.strokeDashoffset = String(CIRC * (1 - Math.min(1, left / S.turnTotal)));
+      fg.classList.toggle('low', left < 8000);
       if (S.turn === S.me && left > 0 && left <= 5000) {
         const sec = Math.ceil(left / 1000);
         if (sec !== lastTick) { lastTick = sec; Snd.tick(); }
       }
     }
     const cd = $('#cd');
-    if (cd && S.nextHandAt) cd.textContent = `· următoarea mână în ${Math.max(0, Math.ceil((S.nextHandAt - now) / 1000))}s`;
-  }, 120);
+    if (cd && S.nextHandAt) cd.textContent = `următoarea mână în ${Math.max(0, Math.ceil((S.nextHandAt - now) / 1000))}s`;
+  }, 100);
 }
 })();
 </script>

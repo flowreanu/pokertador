@@ -3,7 +3,9 @@
 // fiecare client primește doar ce are voie să vadă.
 
 const crypto = require('crypto');
-const { bestScore, handName } = require('./eval');
+const { bestScore, bestFive, handName } = require('./eval');
+
+const AVATARS = ['🦊', '🐼', '🐯', '🦁', '🐸', '🐵', '🦄', '🐙', '🦉', '🐺', '🐻', '🐷', '🐲', '🦈', '🐧', '🦖'];
 
 const MAX_SEATS = 9;
 const RANKS = '23456789TJQKA';
@@ -105,7 +107,7 @@ class Table {
 
   /* ---------- intrare / ieșire ---------- */
 
-  join(token, name, ws, adminKey) {
+  join(token, name, ws, adminKey, avatar) {
     if (this.banned.has(token)) return { error: 'Ai fost scos de la această masă.' };
     let isNew = false;
     let p = this.findByToken(token);
@@ -134,11 +136,13 @@ class Table {
         inHand: false, folded: false, allIn: false, bet: 0, totalBet: 0,
         acted: false, raiseLocked: false, cards: [], last: '', revealed: false,
         winner: false, score: 0, handName: '',
-        isAdmin: false, lastChatAt: 0, lastEmoteAt: 0,
+        isAdmin: false, lastChatAt: 0, lastEmoteAt: 0, best: null,
+        avatar: AVATARS[seat % AVATARS.length],
       };
       this.seats[seat] = p;
       isNew = true;
     }
+    if (AVATARS.includes(avatar)) p.avatar = avatar;
     if (this.checkAdmin(adminKey)) p.isAdmin = true;
     this.touch();
     this.maybeSchedule(this.t.firstHand);
@@ -510,8 +514,10 @@ class Table {
     const active = this.activePlayers();
     for (const p of active) {
       p.revealed = true;
-      p.score = bestScore([...p.cards, ...this.board]);
+      const b = bestFive([...p.cards, ...this.board]);
+      p.score = b.score;
       p.handName = handName(p.score);
+      p.best = b.five.map(cardStr);
     }
     const pots = this.buildPots();
     const won = new Map();
@@ -535,7 +541,7 @@ class Table {
     for (const [p, amount] of won) {
       p.stack += amount;
       p.winner = true;
-      list.push({ seat: p.seat, name: p.name, amount, hand: p.handName });
+      list.push({ seat: p.seat, name: p.name, amount, hand: p.handName, best: p.best });
     }
     list.sort((a, b) => b.amount - a.amount);
     const text = list.map((w) => `${w.name} câștigă ${w.amount}`).join(' · ') + (list[0] ? ` — ${list[0].hand}` : '');
@@ -628,7 +634,7 @@ class Table {
       return {
         seat: p.seat, name: p.name, stack: p.stack, bet: p.bet, folded: p.folded,
         allIn: p.allIn, connected: p.connected, sitOut: p.sitOut, inHand: p.inHand,
-        last: p.last, winner: p.winner, admin: p.isAdmin, cards,
+        last: p.last, winner: p.winner, admin: p.isAdmin, av: p.avatar, cards,
         handName: p.revealed && this.phase === 'ended' ? p.handName : '',
       };
     };

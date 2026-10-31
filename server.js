@@ -89,7 +89,7 @@ wss.on('connection', (ws) => {
       }
       const token = String(msg.token || '').slice(0, 64);
       if (token.length < 8) return;
-      const r = table.join(token, msg.name, ws, String(msg.admin || '').slice(0, 64));
+      const r = table.join(token, msg.name, ws, String(msg.admin || '').slice(0, 64), String(msg.avatar || '').slice(0, 8));
       if (r.error) {
         ws.send(JSON.stringify({ type: 'error', fatal: true, msg: r.error }));
         return;

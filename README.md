@@ -13,6 +13,13 @@ Reguli implementate: blinds, Fold / Check / Call / Raise, All-in, side pots, sho
 
 Cărțile se amestecă pe server (`crypto.randomInt`), iar fiecare jucător primește doar cărțile lui, deci nu se poate trișa din browser.
 
+## Aspect și animații
+
+- Avatare (16 animale la alegere, la intrare), cu un ring care se golește cât îți mai rămâne din timpul pe tură.
+- Fiecare jucător are fisele pariate în față, ca stive colorate pe valori (1, 5, 25, 100, 500, 1000…), iar potul stă în centru.
+- Cărțile zboară de la dealer, cele de pe masă se întorc una câte una, iar la showdown cărțile adversarilor se întorc. Fisele se adună în pot, apoi zboară la câștigător, cu confetti și cu evidențierea celor 5 cărți câștigătoare.
+- Butonul 🎨 schimbă culoarea mesei (verde, albastru, roșu, mov).
+
 ## Admin, chat și sunete
 
 - **Admin:** cine creează masa e adminul (♛ lângă nume). Doar el vede butonul „Începe jocul" și butonul ⚙ Admin: pauză după mâna curentă, small blind, timp pe tură, rebuy on/off, scoate jucător (cel scos nu mai poate reintra pe același link).
