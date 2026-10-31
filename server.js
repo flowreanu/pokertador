@@ -11,6 +11,9 @@ const INDEX = path.join(__dirname, 'public', 'index.html');
 const ID_CHARS = 'abcdefghjkmnpqrstuvwxyz23456789';
 const MAX_ROOMS = 300;
 
+// POKER_FAST=1 scurtează pauzele (doar pentru teste automate)
+const FAST_TIMING = process.env.POKER_FAST === '1' ? { nextHand: 1500, firstHand: 500, street: 300 } : undefined;
+
 const rooms = new Map();
 
 function newRoomId() {
@@ -44,7 +47,7 @@ const server = http.createServer((req, res) => {
       const sb = clamp(o.sb, 1, Math.floor(stack / 4), 10);
       const id = newRoomId();
       const admin = crypto.randomBytes(16).toString('hex');
-      rooms.set(id, new Table(id, { stack, sb, adminKey: admin }));
+      rooms.set(id, new Table(id, { stack, sb, adminKey: admin, timing: FAST_TIMING }));
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ id, admin }));
     });

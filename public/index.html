@@ -219,6 +219,33 @@ button,input,select{font:inherit;color:inherit}
 #emo-grid button{background:none;border:0;font-size:22px;cursor:pointer;border-radius:8px;padding:3px}
 #emo-grid button:hover{background:var(--panel)}
 
+/* ---------- final de joc ---------- */
+.seat.me .avwrap{pointer-events:auto;cursor:pointer}
+.seat.me .avwrap::after{content:"✎";position:absolute;right:-5px;bottom:-3px;width:18px;height:18px;border-radius:50%;background:var(--panel2);
+  border:1px solid var(--line);font-size:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);z-index:3}
+#over{position:fixed;left:0;right:0;bottom:0;top:52px;z-index:40;background:rgba(6,9,8,.93);backdrop-filter:blur(6px);
+  display:flex;justify-content:center;overflow:auto;padding:18px 14px}
+.over-card{position:relative;width:min(460px,100%);display:flex;flex-direction:column;align-items:center;gap:10px;margin:auto 0;
+  animation:resin .6s cubic-bezier(.2,1.3,.4,1)}
+.trophy{font-size:60px;line-height:1;animation:bounce 1.4s ease-in-out infinite}
+@keyframes bounce{50%{transform:translateY(-8px) scale(1.06)}}
+.over-card h2{font-size:clamp(20px,5vw,26px);text-align:center}
+.over-card h2 span{color:var(--gold)}
+.over-card .sub{color:var(--muted);font-size:13px}
+.lb{width:100%;display:flex;flex-direction:column;gap:6px;margin:6px 0 8px}
+.lbrow{display:grid;grid-template-columns:30px 30px 1fr auto auto;gap:8px;align-items:center;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;padding:8px 12px;animation:lbin .5s backwards}
+.lbrow.r1{border-color:var(--gold);background:linear-gradient(90deg,#2d2713,var(--panel))}
+@keyframes lbin{from{opacity:0;transform:translateX(-24px)}}
+.rk{font-size:20px;text-align:center;color:var(--muted)}
+.lav{font-size:22px;text-align:center}
+.lnm{font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lst{color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums}
+.lnet{font-size:12.5px;min-width:58px;text-align:right;font-variant-numeric:tabular-nums}
+.lnet.plus{color:#8fe0b0}.lnet.minus{color:#f0a39d}
+#over-act{width:100%;display:flex;justify-content:center;text-align:center}
+#over-act .btn{flex:0 1 300px;font-size:17px;padding:14px}
+
 /* ---------- modale ---------- */
 .modal{position:fixed;inset:0;background:rgba(5,8,7,.82);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60}
 .modal-card{width:min(360px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:14px}
@@ -312,6 +339,7 @@ button,input,select{font:inherit;color:inherit}
     <div class="sec">
       <button class="btn main" id="a-start">Începe jocul</button>
       <button class="btn" id="a-pause">Pauză după mâna curentă</button>
+      <button class="btn fold" id="a-end">Termină jocul · arată clasamentul</button>
     </div>
     <div class="sec">
       <div class="row2">
@@ -356,6 +384,14 @@ button,input,select{font:inherit;color:inherit}
   </form>
 </div>
 
+<!-- SCHIMBĂ AVATAR -->
+<div class="modal" id="avmodal" hidden>
+  <div class="modal-card">
+    <div class="mh"><h2>Alege avatarul</h2><button class="mini" id="av-x">✕</button></div>
+    <div class="avgrid" id="avgrid2"></div>
+  </div>
+</div>
+
 <!-- EROARE -->
 <div class="modal" id="fatal" hidden>
   <div class="modal-card">
@@ -365,6 +401,7 @@ button,input,select{font:inherit;color:inherit}
   </div>
 </div>
 
+<div id="over" hidden></div>
 <div id="toast"></div>
 
 <script>
@@ -561,8 +598,9 @@ function initGame(room) {
     myAvatar = b.dataset.a;
     avg.querySelectorAll('button').forEach((x) => x.classList.toggle('sel', x === b));
   });
-  if (myName) connect();
+  if (myName && store.get('poker_avatar')) connect();
   else {
+    $('#j-name').value = myName;
     $('#join').hidden = false; $('#j-name').focus();
     $('#join-form').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -571,6 +609,22 @@ function initGame(room) {
       $('#join').hidden = true; connect();
     });
   }
+
+  // schimbi avatarul oricând: click pe propriul avatar de la masă
+  const avg2 = $('#avgrid2');
+  avg2.innerHTML = AVATARS.map((a) => `<button type="button" data-a="${a}">${a}</button>`).join('');
+  avg2.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    myAvatar = b.dataset.a; store.set('poker_avatar', myAvatar);
+    send({ type: 'avatar', av: myAvatar }); $('#avmodal').hidden = true;
+  });
+  $('#av-x').addEventListener('click', () => { $('#avmodal').hidden = true; });
+  $('#avmodal').addEventListener('click', (e) => { if (e.target.id === 'avmodal') $('#avmodal').hidden = true; });
+  $('#seats').addEventListener('click', (e) => {
+    if (!e.target.closest('.seat.me .avwrap')) return;
+    avg2.querySelectorAll('button').forEach((x) => x.classList.toggle('sel', x.dataset.a === myAvatar));
+    $('#avmodal').hidden = false;
+  });
 
   /* --- bara de sus --- */
   $('#copy').addEventListener('click', async () => {
@@ -647,6 +701,10 @@ function initGame(room) {
   $('#a-sb').addEventListener('input', updBb);
   $('#a-start').addEventListener('click', () => { send({ type: 'start' }); $('#admin').hidden = true; A.open = false; });
   $('#a-pause').addEventListener('click', () => send({ type: 'pause', on: !(S && S.paused) }));
+  $('#a-end').addEventListener('click', () => {
+    if (!confirm('Termini jocul după mâna curentă și arăți clasamentul tuturor?')) return;
+    send({ type: 'end' }); $('#admin').hidden = true; A.open = false;
+  });
   $('#a-save').addEventListener('click', () => {
     send({ type: 'settings', sb: Number($('#a-sb').value), timer: Number($('#a-timer').value), allowRebuy: $('#a-rebuy').checked });
     toast('Setări trimise', true);
@@ -666,7 +724,8 @@ function initGame(room) {
     $('#a-start').hidden = S.started;
     $('#a-start').disabled = !S.you.canStart;
     $('#a-start').textContent = S.you.canStart ? 'Începe jocul' : 'Începe jocul (minim 2 jucători)';
-    $('#a-pause').hidden = !S.started;
+    $('#a-pause').hidden = !S.started || S.over;
+    $('#a-end').hidden = !S.started || S.over || S.endAfter;
     $('#a-pause').textContent = S.paused ? '▶ Reia jocul' : '⏸ Pauză după mâna curentă';
     $('#a-players').innerHTML = S.seats.filter(Boolean).map((p) => `<div class="prow"><div>${p.admin ? '<span style="color:var(--gold)">♛</span> ' : ''}${esc(p.name)}${p.connected ? '' : ' <span class="muted">(offline)</span>'}<span class="s">${fmt(p.stack)}</span></div>${p.seat === S.me ? '' : `<button class="mini" data-kick="${p.seat}" data-name="${esc(p.name)}">Scoate</button>`}</div>`).join('');
   }
@@ -797,7 +856,7 @@ function initGame(room) {
   let boardHand = -1, potShown = -1, potCleared = false, potHandNo = -1, potTimer = null, potClearTimer = null;
 
   function render(prev) {
-    $('#blinds').textContent = `${S.sb}/${S.bb}` + (S.paused ? ' · ⏸ pauză' : '');
+    $('#blinds').textContent = `${S.sb}/${S.bb}` + (S.paused ? ' · ⏸ pauză' : '') + (S.endAfter ? ' · se termină după mâna asta' : '');
     $('#b-admin').hidden = !S.you.isAdmin;
     layoutSeats();
     const ev = events(prev, S);
@@ -809,6 +868,7 @@ function initGame(room) {
     renderMsg();
     renderBar();
     applyHighlights();
+    renderOver(prev);
     const myTurn = S.turn === S.me;
     document.title = myTurn ? '▶ Rândul tău · Poker' : 'Poker cu prietenii';
     $('#barwrap').classList.toggle('myturn', myTurn && !sent);
@@ -1069,7 +1129,7 @@ function initGame(room) {
     const y = S.you, me = S.seats[S.me];
     if (!me) return;
     const turnName = S.turn >= 0 && S.seats[S.turn] ? S.seats[S.turn].name : '';
-    const sig = JSON.stringify([y.isTurn, y.toCall, y.minRaiseTo, y.maxTo, y.canRaise, y.canRebuy, me.sitOut, S.currentBet, S.pot, S.handActive, y.hand, me.folded, turnName, sent, S.started, S.paused]);
+    const sig = JSON.stringify([y.isTurn, y.toCall, y.minRaiseTo, y.maxTo, y.canRaise, y.canRebuy, me.sitOut, S.currentBet, S.pot, S.handActive, y.hand, me.folded, turnName, sent, S.started, S.paused, S.over]);
     if (sig === barSig) return;
     barSig = sig;
     const bar = $('#bar');
@@ -1118,7 +1178,8 @@ function initGame(room) {
     }
 
     let info = '';
-    if (!S.started) info = S.you.isAdmin ? 'Tu ești adminul · pornește jocul din butonul de pe masă' : 'Masa nu a început încă';
+    if (S.over) info = 'Joc terminat · vezi clasamentul';
+    else if (!S.started) info = S.you.isAdmin ? 'Tu ești adminul · pornește jocul din butonul de pe masă' : 'Masa nu a început încă';
     else if (me.sitOut) info = 'Ești marcat absent (ai ratat două ture).';
     else if (y.canRebuy) info = 'Ai rămas fără fise.';
     else if (S.handActive && me.folded) info = 'Ai dat fold' + (turnName ? ` · acum joacă <b>${esc(turnName)}</b>` : '');
@@ -1131,6 +1192,56 @@ function initGame(room) {
     else if (me.sitOut) btns = '<button class="btn main" data-x="sitin">Reintră în joc</button>';
     bar.innerHTML = `<div class="info">${info || '&nbsp;'}</div>${btns ? `<div class="btns single">${btns}</div>` : ''}`;
     bar.querySelectorAll('[data-x]').forEach((b) => b.addEventListener('click', () => send({ type: b.dataset.x })));
+  }
+
+  /* --- ecranul de final: clasament + „Joacă din nou" (doar admin) --- */
+  let overTimer = null, overShown = false;
+  function renderOver(prev) {
+    const box = $('#over');
+    if (!S.over) { clearTimeout(overTimer); overTimer = null; overShown = false; box.hidden = true; return; }
+    if (overShown) { updateOverAct(); return; }
+    if (overTimer) return;
+    // lăsăm animațiile ultimei mâini să se termine înainte de clasament
+    const delay = prev && !prev.over ? 3800 : 0;
+    const show = () => { overTimer = null; overShown = true; buildOver(); };
+    if (delay) overTimer = setTimeout(show, delay); else show();
+  }
+  function updateOverAct() {
+    const act = $('#over-act'); if (!act) return;
+    const want = S.you.canRestart ? 'admin' : 'wait';
+    if (act._k === want) return;
+    act._k = want;
+    act.innerHTML = want === 'admin'
+      ? '<button class="btn main" id="again">▶ Joacă din nou</button>'
+      : '<div class="muted">Aștept ca adminul să pornească un joc nou…</div>';
+    const b = $('#again'); if (b) b.onclick = () => send({ type: 'restart' });
+  }
+  function buildOver() {
+    const box = $('#over'), st = S.standings || [], medals = ['🥇', '🥈', '🥉'];
+    const top = st[0];
+    box.style.top = $('.top').offsetHeight + 'px';
+    box.innerHTML = `<div class="over-card"><div class="trophy">🏆</div>
+      <h2>${top ? `<span>${esc(top.name)}</span> câștigă jocul!` : 'Joc terminat'}</h2>
+      <div class="sub">${S.handsPlayed} ${S.handsPlayed === 1 ? 'mână jucată' : 'mâini jucate'}</div>
+      <div class="lb">${st.map((r, i) => `<div class="lbrow ${i === 0 ? 'r1' : ''}" style="animation-delay:${250 + i * 110}ms">
+        <span class="rk">${i < 3 ? medals[i] : i + 1}</span><span class="lav">${esc(r.av || '🙂')}</span>
+        <span class="lnm">${esc(r.name)}</span><span class="lst">${fmt(r.stack)}</span>
+        <span class="lnet ${r.net >= 0 ? 'plus' : 'minus'}">${r.net >= 0 ? '+' : ''}${fmt(r.net)}</span></div>`).join('')}</div>
+      <div id="over-act"></div></div>`;
+    box.hidden = false; updateOverAct();
+    const cols = ['#e6c36a', '#3fa66b', '#d0524a', '#64b5f6', '#ba68c8', '#ffffff'];
+    const w = box.clientWidth, h = box.clientHeight;
+    for (let i = 0; i < 80; i++) {
+      const e = document.createElement('i');
+      e.className = 'cf'; e.style.cssText = `left:${Math.random() * w}px;top:-20px;background:${cols[i % cols.length]}`;
+      box.appendChild(e);
+      const a = e.animate([
+        { transform: 'translate(0,0) rotate(0)', opacity: 1 },
+        { transform: `translate(${(Math.random() - 0.5) * 140}px,${h + 40}px) rotate(${Math.random() * 720}deg)`, opacity: 1 },
+      ], { duration: 2400 + Math.random() * 2200, delay: Math.random() * 1000, easing: 'cubic-bezier(.3,.4,.6,1)' });
+      a.onfinish = () => e.remove();
+    }
+    Snd.win();
   }
 
   /* --- sunete la schimbări de stare --- */

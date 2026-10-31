@@ -69,6 +69,9 @@ class Table {
     this.paused = false;
     this.allowRebuy = true;
     this.pendingSb = null;
+    this.over = false;
+    this.endAfter = false;
+    this.handsPlayed = 0;
   }
 
   checkAdmin(key) {
@@ -137,6 +140,7 @@ class Table {
         acted: false, raiseLocked: false, cards: [], last: '', revealed: false,
         winner: false, score: 0, handName: '',
         isAdmin: false, lastChatAt: 0, lastEmoteAt: 0, best: null,
+        bustHand: 0, bustStart: 0, handStart: 0,
         avatar: AVATARS[seat % AVATARS.length],
       };
       this.seats[seat] = p;
@@ -252,10 +256,31 @@ class Table {
       case 'emote':
         this.emote(p, msg.e);
         return;
+      case 'avatar':
+        if (AVATARS.includes(msg.av)) p.avatar = msg.av;
+        break;
+      case 'end':
+        if (!p.isAdmin) return this.err(p, 'Doar adminul poate termina jocul.');
+        if (!this.started || this.over) return;
+        if (this.handActive) {
+          this.endAfter = true;
+          this.sys('Jocul se termină după mâna curentă');
+        } else {
+          this.gameOver();
+        }
+        break;
+      case 'restart':
+        if (!p.isAdmin) return this.err(p, 'Doar adminul poate porni un joc nou.');
+        if (!this.over) return;
+        this.restartGame();
+        break;
       case 'rebuy':
+        if (this.over) return this.err(p, 'Jocul s-a terminat.');
         if (!this.allowRebuy) return this.err(p, 'Adminul a dezactivat rebuy.');
         if (p.stack === 0 && !(this.handActive && p.inHand)) {
           p.stack = this.startStack;
+          p.bustHand = 0;
+          p.bustStart = 0;
           p.rebuys++;
           p.sitOut = false;
           p.timeouts = 0;
@@ -283,7 +308,7 @@ class Table {
   /* ---------- pornirea unei mâini ---------- */
 
   maybeSchedule(delay) {
-    if (!this.started || this.handActive || this.nextTimer || this.paused) return;
+    if (!this.started || this.handActive || this.nextTimer || this.paused || this.over) return;
     if (this.eligibleCount() < 2) { this.nextHandAt = 0; return; }
     this.nextHandAt = Date.now() + delay;
     this.nextTimer = setTimeout(() => { this.nextTimer = null; this.startHand(); }, delay);
@@ -293,7 +318,7 @@ class Table {
     clearTimeout(this.nextTimer);
     this.nextTimer = null;
     this.nextHandAt = 0;
-    if (this.handActive || this.paused) return;
+    if (this.handActive || this.paused || this.over) return;
     if (this.pendingSb) { this.sb = this.pendingSb; this.bb = this.sb * 2; this.pendingSb = null; }
 
     // elimină jucătorii care au ieșit
@@ -314,7 +339,7 @@ class Table {
       Object.assign(p, {
         cards: [], bet: 0, totalBet: 0, folded: false, allIn: false, acted: false,
         raiseLocked: false, last: '', revealed: false, winner: false, score: 0, handName: '',
-        inHand: this.eligible(p),
+        inHand: this.eligible(p), handStart: p.stack,
       });
     }
 
@@ -569,8 +594,62 @@ class Table {
     this.phase = 'ended';
     for (const p of this.players()) p.bet = 0;
     for (const p of this.players()) if (p.leaving) this.seats[p.seat] = null;
-    this.maybeSchedule(this.t.nextHand);
+    this.handsPlayed++;
+    for (const p of this.players()) {
+      if (p.inHand && p.stack === 0 && !p.bustHand) { p.bustHand = this.handNo; p.bustStart = p.handStart; }
+    }
+    const holders = this.players().filter((p) => p.stack > 0).length;
+    if (this.endAfter || (this.started && holders <= 1)) this.gameOver();
+    else this.maybeSchedule(this.t.nextHand);
     this.broadcast();
+  }
+
+  /* ---------- sfârșit de joc ---------- */
+
+  standings() {
+    const ps = this.players().slice().sort((a, b) =>
+      (b.stack - a.stack) || ((b.bustHand || 0) - (a.bustHand || 0)) ||
+      ((b.bustStart || 0) - (a.bustStart || 0)) || a.name.localeCompare(b.name));
+    return ps.map((p, i) => ({
+      rank: i + 1, seat: p.seat, name: p.name, av: p.avatar, stack: p.stack,
+      net: p.stack - this.startStack * (1 + p.rebuys), rebuys: p.rebuys,
+    }));
+  }
+
+  gameOver() {
+    clearTimeout(this.turnTimer);
+    clearTimeout(this.nextTimer);
+    clearTimeout(this.streetTimer);
+    this.turnTimer = this.nextTimer = this.streetTimer = null;
+    this.over = true;
+    this.endAfter = false;
+    this.phase = 'over';
+    this.turn = -1;
+    this.nextHandAt = 0;
+    const top = this.standings()[0];
+    this.sys(top ? `Joc terminat — ${top.name} câștigă!` : 'Joc terminat');
+    this.broadcast();
+  }
+
+  restartGame() {
+    for (const p of this.players()) if (!p.connected) this.seats[p.seat] = null;
+    for (const p of this.players()) {
+      Object.assign(p, {
+        stack: this.startStack, rebuys: 0, bustHand: 0, bustStart: 0, sitOut: false, timeouts: 0,
+        leaving: false, cards: [], bet: 0, totalBet: 0, inHand: false, folded: false, allIn: false,
+        acted: false, raiseLocked: false, last: '', revealed: false, winner: false, handName: '',
+      });
+    }
+    this.over = false;
+    this.endAfter = false;
+    this.paused = false;
+    this.handsPlayed = 0;
+    this.result = null;
+    this.board = [];
+    this.currentBet = 0;
+    this.phase = 'idle';
+    this.sys(`Joc nou! Toată lumea pornește cu ${this.startStack} fise`);
+    this.maybeSchedule(this.t.firstHand);
   }
 
   /* ---------- chat ---------- */
@@ -645,6 +724,10 @@ class Table {
       room: this.id,
       started: this.started,
       paused: this.paused,
+      over: this.over,
+      endAfter: this.endAfter,
+      handsPlayed: this.handsPlayed,
+      standings: this.over ? this.standings() : null,
       phase: this.phase,
       handActive: this.handActive,
       handNo: this.handNo,
@@ -662,8 +745,9 @@ class Table {
       seats: this.seats.map((p) => (p ? pub(p) : null)),
       you: {
         isTurn, toCall, minRaiseTo, maxTo, canRaise, hand: myHand,
-        canRebuy: me.stack === 0 && this.allowRebuy && !(this.handActive && me.inHand),
+        canRebuy: me.stack === 0 && this.allowRebuy && !this.over && !(this.handActive && me.inHand),
         isAdmin: me.isAdmin,
+        canRestart: me.isAdmin && this.over,
         canStart: me.isAdmin && !this.started && this.eligibleCount() >= 2,
         settings: me.isAdmin
           ? { sb: this.pendingSb || this.sb, timer: this.t.turn / 1000, allowRebuy: this.allowRebuy }

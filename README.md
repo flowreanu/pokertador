@@ -27,6 +27,12 @@ Cărțile se amestecă pe server (`crypto.randomInt`), iar fiecare jucător prim
 - **Chat:** butonul 💬, cu selector de emoji și reacții rapide (👍😂😎🔥…) care plutesc deasupra jucătorului. Ultimele 50 de mesaje se păstrează pentru cei care intră mai târziu.
 - **Sunete:** cărți, fise, check, fold, all-in, „e rândul tău", tic-tac în ultimele 5 secunde și melodie la câștig. Sunt generate în browser (fără fișiere audio). Butonul 🔊 le oprește, iar alegerea se ține minte.
 
+## Final de joc și clasament
+
+- Jocul se termină singur când un singur jucător mai are fise, sau când adminul apasă ⚙ Admin → „Termină jocul" (se oprește după mâna curentă).
+- Toți văd clasamentul final (locul, avatarul, fisele și câștigul/pierderea față de start). Doar adminul vede **▶ Joacă din nou**, care resetează fisele și începe o partidă nouă.
+- Îți schimbi avatarul oricând dând click pe propriul avatar de la masă.
+
 ## Pornire locală
 
 ```bash

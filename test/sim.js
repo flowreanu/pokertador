@@ -59,6 +59,8 @@ async function simulate(nPlayers, hands, seed) {
   let multiPots = 0;
   while (played < hands) {
     if (!t.handActive) {
+      // jocul se termină când rămâne un singur jucător cu fise: pornim unul nou
+      if (t.over) { t.restartGame(); total = ps.length * 1000; }
       // rebuy pentru cei fără fise
       for (const p of ps) {
         if (p.stack === 0) { p.stack = 1000; total += 1000; }
@@ -163,4 +165,51 @@ async function simulate(nPlayers, hands, seed) {
   assert(a.join('tok-user-00001', 'User', mkws(), '').error, 'cel scos nu mai poate intra');
   a.destroy();
   console.log('Admin + chat: OK');
+
+  /* ---------- sfârșit de joc, clasament, restart ---------- */
+  const g = new Table('go', { stack: 1000, sb: 10, adminKey: KEY, timing: { street: 0, nextHand: 600000, firstHand: 600000 } });
+  const ga = g.join('tok-ga-00000001', 'Ana', mkws(), KEY).p;
+  const gb = g.join('tok-gb-00000001', 'Bob', mkws(), '').p;
+  g.started = true;
+  let guard = 0;
+  while (!g.over && guard++ < 300) {
+    g.startHand();
+    let inner = 0;
+    while (g.handActive && inner++ < 100) {
+      if (g.streetTimer) { await new Promise((r) => setTimeout(r, 2)); continue; }
+      const p = g.seats[g.turn];
+      g.act(p, { action: 'raise', amount: p.bet + p.stack });
+      if (g.handActive && g.turn === p.seat) g.act(p, { action: 'call' });
+    }
+  }
+  assert(g.over, 'jocul trebuia să se termine când unul rămâne fără fise');
+  const st = g.standings();
+  assert.strictEqual(st.length, 2);
+  assert.strictEqual(st[0].stack, 2000, 'câștigătorul are toate fișele');
+  assert.strictEqual(st[1].stack, 0);
+  assert.strictEqual(st[0].net, 1000);
+  assert.strictEqual(st[1].net, -1000);
+  assert(g.view(ga).standings && g.view(ga).you.canRestart && !g.view(gb).you.canRestart, 'restart doar pentru admin');
+  assert(!g.view(gb).you.canRebuy, 'fără rebuy după terminarea jocului');
+  g.onMessage(gb, { type: 'restart' });
+  assert(g.over, 'un jucător obișnuit nu poate porni un joc nou');
+  g.startHand();
+  assert(!g.handActive, 'nu se mai dau mâini după final');
+  g.onMessage(ga, { type: 'restart' });
+  assert(!g.over && ga.stack === 1000 && gb.stack === 1000 && g.handsPlayed === 0, 'restart de admin');
+  g.startHand();
+  assert(g.handActive, 'după restart se joacă din nou');
+  // „Termină jocul" în timpul unei mâini: se oprește la finalul ei
+  g.onMessage(gb, { type: 'end' });
+  assert(!g.endAfter, 'doar adminul poate termina jocul');
+  g.onMessage(ga, { type: 'end' });
+  assert(g.endAfter && !g.over);
+  while (g.handActive) {
+    if (g.streetTimer) { await new Promise((r) => setTimeout(r, 2)); continue; }
+    const p = g.seats[g.turn];
+    g.act(p, { action: p.bet < g.currentBet ? 'call' : 'check' });
+  }
+  assert(g.over, 'jocul s-a terminat după mâna curentă');
+  g.destroy();
+  console.log('Final de joc + clasament: OK');
 })().catch((e) => { console.error(e); process.exit(1); });
